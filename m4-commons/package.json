@@ -1,0 +1,13 @@
+{
+  "name": "@m4/commons",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "~4.5.5",
+    "tslib": "~2.3.1"
+  }
+}

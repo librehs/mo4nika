@@ -1,0 +1,149 @@
+/**
+ * This is the main configuration file for Rush.
+ * For full documentation, please see https://rushjs.io
+ */
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+
+  /**
+   * (Required) This specifies the version of the Rush engine to be used in this repo.
+   * Rush's "version selector" feature ensures that the globally installed tool will
+   * behave like this release, regardless of which version is installed globally.
+   *
+   * The common/scripts/install-run-rush.js automation script also uses this version.
+   *
+   * NOTE: If you upgrade to a new major version of Rush, you should replace the "v5"
+   * path segment in the "$schema" field for all your Rush config files.  This will ensure
+   * correct error-underlining and tab-completion for editors such as VS Code.
+   */
+  "rushVersion": "5.60.0",
+
+  /**
+   * The next field selects which package manager should be installed and determines its version.
+   * Rush installs its own local copy of the package manager to ensure that your build process
+   * is fully isolated from whatever tools are present in the local environment.
+   *
+   * Specify one of: "pnpmVersion", "npmVersion", or "yarnVersion".  See the Rush documentation
+   * for details about these alternatives.
+   */
+  "pnpmVersion": "6.27.1",
+
+  // "npmVersion": "6.14.15",
+  // "yarnVersion": "1.9.4",
+
+  /**
+   * Options that are only used when the PNPM package manager is selected
+   */
+  "pnpmOptions": {
+    // "pnpmStore": "local",
+    "strictPeerDependencies": true,
+    // "resolutionStrategy": "fast",
+    "preventManualShrinkwrapChanges": true,
+    "useWorkspaces": true
+  },
+  // The code will target ES2021 (thus at least Node 15), and 15 has EOL-ed.
+  "nodeSupportedVersionRange": ">=16",
+  "suppressNodeLtsWarning": true,
+  "ensureConsistentVersions": true,
+  "projectFolderMinDepth": 1,
+  "projectFolderMaxDepth": 1,
+
+  "gitPolicy": {
+    /**
+     * The commit message to use when committing changes during 'rush publish'.
+     *
+     * For example, if you want to prevent these commits from triggering a CI build,
+     * you might configure your system's trigger to look for a special string such as "[skip-ci]"
+     * in the commit message, and then customize Rush's message to contain that string.
+     */
+    // "versionBumpCommitMessage": "Bump versions [skip ci]",
+    /**
+     * The commit message to use when committing changes during 'rush version'.
+     *
+     * For example, if you want to prevent these commits from triggering a CI build,
+     * you might configure your system's trigger to look for a special string such as "[skip-ci]"
+     * in the commit message, and then customize Rush's message to contain that string.
+     */
+    // "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
+  },
+  "repository": {
+    "url": "https://github.com/librehs/mo4nika"
+  },
+
+  /**
+   * Event hooks are customized script actions that Rush executes when specific events occur
+   */
+  "eventHooks": {
+    /**
+     * The list of shell commands to run before the Rush installation starts
+     */
+    "preRushInstall": [
+      // "common/scripts/pre-rush-install.js"
+    ],
+
+    /**
+     * The list of shell commands to run after the Rush installation finishes
+     */
+    "postRushInstall": [],
+
+    /**
+     * The list of shell commands to run before the Rush build command starts
+     */
+    "preRushBuild": [],
+
+    /**
+     * The list of shell commands to run after the Rush build command finishes
+     */
+    "postRushBuild": []
+  },
+
+  /**
+   * Installation variants allow you to maintain a parallel set of configuration files that can be
+   * used to build the entire monorepo with an alternate set of dependencies.  For example, suppose
+   * you upgrade all your projects to use a new release of an important framework, but during a transition period
+   * you intend to maintain compatibility with the old release.  In this situation, you probably want your
+   * CI validation to build the entire repo twice: once with the old release, and once with the new release.
+   *
+   * Rush "installation variants" correspond to sets of config files located under this folder:
+   *
+   *   common/config/rush/variants/<variant_name>
+   *
+   * The variant folder can contain an alternate common-versions.json file.  Its "preferredVersions" field can be used
+   * to select older versions of dependencies (within a loose SemVer range specified in your package.json files).
+   * To install a variant, run "rush install --variant <variant_name>".
+   *
+   * For more details and instructions, see this article:  https://rushjs.io/pages/advanced/installation_variants/
+   */
+  "variants": [
+    // {
+    //   /**
+    //    * The folder name for this variant.
+    //    */
+    //   "variantName": "old-sdk",
+    //
+    //   /**
+    //    * An informative description
+    //    */
+    //   "description": "Build this repo using the previous release of the SDK"
+    // }
+  ],
+  "telemetryEnabled": false,
+
+  /**
+   * Allows creation of hotfix changes. This feature is experimental so it is disabled by default.
+   * If this is set, 'rush change' only allows a 'hotfix' change type to be specified. This change type
+   * will be used when publishing subsequent changes from the monorepo.
+   */
+  // "hotfixChangeEnabled": false,
+
+  "projects": [
+    {
+      "packageName": "@m4/commons",
+      "projectFolder": "m4-commons"
+    },
+    {
+      "packageName": "@m4/senders",
+      "projectFolder": "m4-senders"
+    }
+  ]
+}
