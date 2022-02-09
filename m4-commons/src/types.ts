@@ -30,15 +30,18 @@ interface ImageMessage {
 
 export type Message = TextMessage | ImageMessage
 
-export interface Result {
-  ok: boolean
-  message?: any
-}
+export type Result = ResultSuccess | ResultFailure
 
-export interface SendResult extends Result {
+export interface ResultSuccess {
+  ok: true
   identifer: string
 }
 
+export interface ResultFailure {
+  ok: false
+  error?: Error
+}
+
 export interface Sender {
-  sendMessage: (m: Message) => Promise<SendResult | Result>
+  sendMessage: (m: Message) => Promise<Result>
 }

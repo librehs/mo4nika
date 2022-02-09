@@ -144,6 +144,10 @@
     {
       "packageName": "@m4/senders",
       "projectFolder": "m4-senders"
+    },
+    {
+      "packageName": "@m4/daemon",
+      "projectFolder": "m4-daemon"
     }
   ]
 }

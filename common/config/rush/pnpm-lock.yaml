@@ -7,9 +7,35 @@ importers:
 
   ../../m4-commons:
     specifiers:
+      '@types/node': ~17.0.13
+      picocolors: ~1.0.0
       tslib: ~2.3.1
       typescript: ~4.5.5
+    dependencies:
+      picocolors: 1.0.0
     devDependencies:
+      '@types/node': 17.0.13
+      tslib: 2.3.1
+      typescript: 4.5.5
+
+  ../../m4-daemon:
+    specifiers:
+      '@m4/commons': workspace:*
+      '@types/node': ~17.0.13
+      '@vercel/ncc': ~0.33.1
+      commander: ~9.0.0
+      grammy: ~1.6.2
+      picocolors: ~1.0.0
+      tslib: ~2.3.1
+      typescript: ~4.5.5
+    dependencies:
+      commander: 9.0.0
+      grammy: 1.6.2
+      picocolors: 1.0.0
+    devDependencies:
+      '@m4/commons': link:../m4-commons
+      '@types/node': 17.0.13
+      '@vercel/ncc': 0.33.1
       tslib: 2.3.1
       typescript: 4.5.5
 
@@ -30,11 +56,25 @@ packages:
     resolution: {integrity: sha512-ZJ+X+w5qo6YxCRDWt63+SD2iX+xitP3Z7ieLUWw1b7OanljAMjPRry2PvBRoA1Zg0nFqulxFtiAHxxN1v8BXiQ==}
     dev: false
 
+  /@types/node/17.0.13:
+    resolution: {integrity: sha512-Y86MAxASe25hNzlDbsviXl8jQHb0RDvKt4c40ZJQ1Don0AAL0STLZSs4N+6gLEO55pedy7r2cLwS+ZDxPm/2Bw==}
+    dev: true
+
+  /@vercel/ncc/0.33.1:
+    resolution: {integrity: sha512-Mlsps/P0PLZwsCFtSol23FGqT3FhBGb4B1AuGQ52JTAtXhak+b0Fh/4T55r0/SVQPeRiX9pNItOEHwakGPmZYA==}
+    hasBin: true
+    dev: true
+
   /abort-controller/3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
     engines: {node: '>=6.5'}
     dependencies:
       event-target-shim: 5.0.1
+    dev: false
+
+  /commander/9.0.0:
+    resolution: {integrity: sha512-JJfP2saEKbQqvW+FI93OYUB4ByV5cizMpFMiiJI8xDbBvQvSkIk0VvQdn1CZ8mqAO8Loq2h0gYTYtDFUZUeERw==}
+    engines: {node: ^12.20.0 || >=14}
     dev: false
 
   /debug/4.3.3:
@@ -81,6 +121,10 @@ packages:
         optional: true
     dependencies:
       whatwg-url: 5.0.0
+    dev: false
+
+  /picocolors/1.0.0:
+    resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
     dev: false
 
   /tr46/0.0.3:

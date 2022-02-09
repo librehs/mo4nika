@@ -1,12 +1,6 @@
 import { Bot } from 'grammy'
 
-import type {
-  Message,
-  Sender,
-  Result,
-  ImageItem,
-  SendResult,
-} from '@m4/commons/src/types'
+import type { Message, Sender, Result, ImageItem } from '@m4/commons/src/types'
 import { InputMediaPhoto } from 'grammy/out/platform.node'
 
 export interface Config {
@@ -23,7 +17,7 @@ export class TelegramSender implements Sender {
     this.#chatId = config.chatId
   }
 
-  async sendMessage(m: Message): Promise<SendResult | Result> {
+  async sendMessage(m: Message) {
     switch (m.type) {
       case 'text': {
         const msg = await this.#bot.api.sendMessage(this.#chatId, m.text)
