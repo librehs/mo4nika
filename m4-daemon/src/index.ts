@@ -10,6 +10,7 @@ const L = Log('daemon')
 program.option('-c, --config <config_path>')
 
 async function startBot(bot: Bot, config: Config) {
+  await bot.init()
   const { chatId, channelId } = config
   const me = await bot.botInfo
 
