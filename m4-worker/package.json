@@ -1,0 +1,29 @@
+{
+  "name": "@m4/worker",
+  "version": "0.1.0",
+  "main": "dist/worker.js",
+  "private": true,
+  "scripts": {
+    "build": "webpack"
+  },
+  "dependencies": {
+    "@m4/daemon": "workspace:*",
+    "grammy": "~1.6.2",
+    "worktop": "~0.7.3",
+    "typescript": "~4.5.5",
+    "path-browserify": "~1.0.1",
+    "https-browserify": "~1.0.0",
+    "stream-browserify": "~3.0.0",
+    "stream-http": "~3.2.0",
+    "buffer": "~6.0.3",
+    "url": "~0.11.0"
+  },
+  "devDependencies": {
+    "tslib": "~2.3.1",
+    "webpack": "~5.68.0",
+    "ts-loader": "~9.2.6",
+    "webpack-cli": "~4.9.2",
+    "@m4/commons": "workspace:*",
+    "@m4/daemon": "workspace:*"
+  }
+}

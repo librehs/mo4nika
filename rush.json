@@ -148,6 +148,10 @@
     {
       "packageName": "@m4/daemon",
       "projectFolder": "m4-daemon"
+    },
+    {
+      "packageName": "@m4/worker",
+      "projectFolder": "m4-worker"
     }
   ]
 }
