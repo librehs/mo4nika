@@ -3,7 +3,9 @@ import { program } from 'commander'
 import { existsSync, readFileSync } from 'fs'
 import { Config } from './types'
 import Log from '@m4/commons/src/logger'
-import configureBot from './configure'
+import setPublish from './handler/publish'
+import setSave from './handler/save'
+import { parseChatId } from './utils'
 
 const L = Log('daemon')
 
@@ -11,7 +13,7 @@ program.option('-c, --config <config_path>')
 
 async function startBot(bot: Bot, config: Config) {
   await bot.init()
-  const { chatId, channelId } = config
+  const { chatId, channelId } = config._
   const me = await bot.botInfo
 
   L.i(`Watching chatId=${chatId}`)
@@ -56,6 +58,8 @@ async function main() {
   }
   const configJson = readFileSync(options.config, 'utf-8')
   const config: Partial<Config> = JSON.parse(configJson)
+  config.channelId = parseChatId(config.channelId ?? '')
+  config.chatId = parseChatId(config.chatId ?? '')
   if (!config.botToken) {
     L.cr()('Bot token not exist in config.botToken')
     process.exit(1)
@@ -68,14 +72,26 @@ async function main() {
     L.cr()('Channel ID does not exist in config.channelId')
     process.exit(1)
   }
+  config._ = {
+    channelId: Number(`-100${config.channelId}`),
+    chatId: Number(`-100${config.chatId}`),
+  }
   const bot = new Bot(config.botToken)
 
   bot.catch((e) => {
     L.e('[Bot]', e.error)
   })
 
-  await startBot(bot, config as Config)
-  configureBot(bot, config as Config)
+  const _conf = config as Config
+
+  await startBot(bot, _conf)
+  setPublish(bot, _conf)
+  const feature = config.feature ?? {}
+
+  if (feature.save) {
+    await setSave(bot, _conf)
+  }
+
   bot.start()
 }
 

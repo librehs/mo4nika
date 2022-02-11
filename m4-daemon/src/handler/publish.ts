@@ -1,10 +1,12 @@
 import { Bot, InlineKeyboard } from 'grammy'
-import type { Config } from './types'
+import type { Config } from '../types'
 
 import Log from '@m4/commons/src/logger'
-const L = Log('daemon')
+const L = Log('publish')
 
 export default function configureBot(bot: Bot, config: Config) {
+  L.d('Configured.')
+
   const { chatId, channelId } = config
 
   bot.command('ping', async (ctx) => {
