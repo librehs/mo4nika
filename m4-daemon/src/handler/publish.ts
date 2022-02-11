@@ -7,7 +7,7 @@ const L = Log('publish')
 export default function configureBot(bot: Bot, config: Config) {
   L.d('Configured.')
 
-  const { chatId, channelId } = config
+  const { chatId, channelId } = config._
 
   bot.command('ping', async (ctx) => {
     const msg = ctx.message
@@ -24,6 +24,7 @@ export default function configureBot(bot: Bot, config: Config) {
       L.w('Message not found for command, skipping')
       return
     }
+    if (msg.chat.id !== chatId) return
     const targetMsg = msg.reply_to_message
     if (!targetMsg) {
       L.w(`OP for #${msg.message_id} not found!`)
