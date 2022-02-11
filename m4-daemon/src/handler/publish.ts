@@ -4,7 +4,7 @@ import type { Config } from '../types'
 import Log from '@m4/commons/src/logger'
 const L = Log('publish')
 
-export default function configureBot(bot: Bot, config: Config) {
+export default async function configureBot(bot: Bot, config: Config) {
   L.d('Configured.')
 
   const { chatId, channelId } = config._

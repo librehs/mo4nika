@@ -85,9 +85,10 @@ async function main() {
   const _conf = config as Config
 
   await startBot(bot, _conf)
-  setPublish(bot, _conf)
   const feature = config.feature ?? {}
-
+  if (feature.publish && feature.publish.enabled) {
+    await setPublish(bot, _conf)
+  }
   if (feature.save) {
     await setSave(bot, _conf)
   }

@@ -3,6 +3,10 @@ interface SaveConfig {
   url: string
 }
 
+interface PublishConfig {
+  enabled: boolean
+}
+
 interface SpecializedId {
   chatId: number
   channelId: number
@@ -10,6 +14,7 @@ interface SpecializedId {
 
 interface Feature {
   save?: SaveConfig
+  publish?: PublishConfig
 }
 
 export interface Config {
