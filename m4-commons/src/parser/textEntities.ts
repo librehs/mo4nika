@@ -3,12 +3,17 @@ import type { MessageEntity } from 'grammy/out/platform.node'
 export default function parseTextEntities(
   text: string,
   entities: MessageEntity[]
-): string {
+): { md: string; tags: string[] } {
   let ret = text
+  const tags: string[] = []
   for (const i of entities.sort((x, y) => y.offset - x.offset)) {
     const bef = ret.slice(0, i.offset)
     const aft = ret.slice(i.offset + i.length)
     let mid = ret.slice(i.offset, i.offset + i.length)
+
+    const tailBr = mid.match(/\n$/) !== null ? '\n' : ''
+    const headBr = mid.match(/^\n/) !== null ? '\n' : ''
+    mid = mid.replace(/^\n/, '').replace(/\n$/, '')
 
     switch (i.type) {
       // Links
@@ -65,8 +70,11 @@ export default function parseTextEntities(
         break
       }
 
+      case 'hashtag': {
+        tags.push(mid.replace(/^#/, ''))
+      }
+
       case 'mention':
-      case 'hashtag':
       case 'cashtag':
       case 'bot_command': {
         // Nothing needed
@@ -74,7 +82,10 @@ export default function parseTextEntities(
       }
     }
 
-    ret = bef + mid + aft
+    ret = bef + headBr + mid + tailBr + aft
   }
-  return ret
+  return {
+    md: ret,
+    tags,
+  }
 }

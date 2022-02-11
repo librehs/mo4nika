@@ -4,25 +4,55 @@ import parseTextEntities from './textEntities'
 import { MessageEntity } from 'grammy/out/platform.node'
 
 const msg = {
-  caption: 'test1 - 2 3 4\nand...\nconsole.log("HAI"); ~\n\nff\nff\nend',
+  caption:
+    'test bold italic underline\n' +
+    'test link\n' +
+    'test console.log\n' +
+    'test\n' +
+    'console.log("test")\n' +
+    'console.log("tset")\n' +
+    '\n' +
+    '#a #b #c #hashes',
   caption_entities: [
+    { offset: 5, length: 4, type: 'bold' },
+    { offset: 10, length: 6, type: 'italic' },
+    { offset: 17, length: 10, type: 'underline' },
     {
-      offset: 3,
-      length: 2,
+      offset: 32,
+      length: 5,
       type: 'text_link',
       url: 'https://bing.com/',
     },
-    { offset: 21, length: 19, type: 'code' },
-    { offset: 44, length: 6, type: 'code' },
+    { offset: 42, length: 12, type: 'code' },
+    { offset: 59, length: 41, type: 'code' },
+    { offset: 100, length: 2, type: 'hashtag' },
+    { offset: 103, length: 2, type: 'hashtag' },
+    { offset: 106, length: 2, type: 'hashtag' },
+    { offset: 109, length: 7, type: 'hashtag' },
   ],
-  target:
-    'tes[t1](https://bing.com/) - 2 3 4\nand...\n`console.log("HAI");` ~\n\n```\nff\nff\n```\nend',
+  target: {
+    md:
+      'test **bold** *italic* underline\n' +
+      'test [link](https://bing.com/)\n' +
+      'test `console.log`\n' +
+      'test\n' +
+      '```\n' +
+      'console.log("test")\n' +
+      'console.log("tset")\n' +
+      '```\n' +
+      '\n' +
+      '#a #b #c #hashes',
+    tags: ['a', 'b', 'c', 'hashes'],
+  },
 }
 
 describe('parseTextEntities', () => {
   it('can parse mixed text', () => {
-    expect(
-      parseTextEntities(msg.caption, msg.caption_entities as MessageEntity[])
-    ).to.be.deep.eq(msg.target)
+    const ret = parseTextEntities(
+      msg.caption,
+      msg.caption_entities as MessageEntity[]
+    )
+    expect(ret.md).to.be.deep.eq(msg.target.md)
+    expect(ret.tags).to.be.eq(ret.tags)
   })
 })

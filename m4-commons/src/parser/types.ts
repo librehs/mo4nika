@@ -5,6 +5,7 @@ export type PostMessageMeta = {
   type: string
   date: Date
   editDate?: Date
+  tags: string[]
 }
 
 type PostMsgText = {

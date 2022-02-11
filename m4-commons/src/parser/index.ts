@@ -1,11 +1,12 @@
 import type { Message } from 'grammy/out/platform.node'
-import type { PostMessage, PostMessageMeta } from './types'
+import type { PostMessage } from './types'
 import parseTextEntities from './textEntities'
 
 export function parseMessage(m: Message): PostMessage {
   const base = {
     id: m.message_id,
     date: new Date(m.date * 1000),
+    tags: [],
   }
   if (m.edit_date) {
     // @ts-expect-error
@@ -13,13 +14,16 @@ export function parseMessage(m: Message): PostMessage {
   }
 
   if (m.text) {
+    const { md, tags } = parseTextEntities(m.text, m.entities ?? [])
     return {
       ...base,
       type: 'text',
-      text: parseTextEntities(m.text, m.entities ?? []),
+      text: md,
+      tags,
     }
   }
   if (m.photo) {
+    const { md, tags } = parseTextEntities(m.caption!, m.caption_entities ?? [])
     return {
       ...base,
       type: 'gallary',
@@ -27,9 +31,10 @@ export function parseMessage(m: Message): PostMessage {
       photos: [
         {
           photo: m.photo,
-          caption: parseTextEntities(m.caption!, m.caption_entities ?? []),
+          caption: md,
         },
       ],
+      tags,
     }
   }
 
