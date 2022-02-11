@@ -1,11 +1,17 @@
 import type { Message } from 'grammy/out/platform.node'
+import type { PostMessage, PostMessageMeta } from './types'
 import parseTextEntities from './textEntities'
-import { PostMessage } from './types'
 
 export function parseMessage(m: Message): PostMessage {
   const base = {
     id: m.message_id,
+    date: new Date(m.date * 1000),
   }
+  if (m.edit_date) {
+    // @ts-expect-error
+    base.editDate = new Date(m.edit_date * 1000)
+  }
+
   if (m.text) {
     return {
       ...base,

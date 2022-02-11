@@ -1,8 +1,10 @@
 import type { PhotoSize } from 'grammy/out/platform.node'
 
-type PostMessageMeta = {
+export type PostMessageMeta = {
   id: number
   type: string
+  date: Date
+  editDate?: Date
 }
 
 type PostMsgText = {
