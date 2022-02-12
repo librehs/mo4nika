@@ -1,4 +1,22 @@
-import type { PhotoSize } from 'grammy/out/platform.node'
+import type { Chat, PhotoSize, User } from 'grammy/out/platform.node'
+
+type ForwardUserInfo = {
+  as: 'user'
+  user: User
+}
+
+type ForwardAnonInfo = {
+  as: 'anon'
+  channel: Chat
+}
+
+type ForwardChannelInfo = {
+  as: 'channel'
+  channel: Chat
+  id: number
+}
+
+type ForwardInfo = ForwardUserInfo | ForwardChannelInfo | ForwardAnonInfo
 
 export type PostMessageMeta = {
   id: number
@@ -6,6 +24,7 @@ export type PostMessageMeta = {
   date: Date
   editDate?: Date
   tags: string[]
+  forwarded?: ForwardInfo
 }
 
 type PostMsgText = {
