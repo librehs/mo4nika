@@ -5,18 +5,29 @@ type ForwardUserInfo = {
   user: User
 }
 
+type ForwardAnonUserInfo = {
+  as: 'anonuser'
+  name: string
+}
+
 type ForwardAnonInfo = {
   as: 'anon'
   channel: Chat
+  sig?: string
 }
 
 type ForwardChannelInfo = {
   as: 'channel'
   channel: Chat
-  id: number
+  msgId: number
+  sig?: string
 }
 
-type ForwardInfo = ForwardUserInfo | ForwardChannelInfo | ForwardAnonInfo
+type ForwardInfo =
+  | ForwardUserInfo
+  | ForwardChannelInfo
+  | ForwardAnonInfo
+  | ForwardAnonUserInfo
 
 export type PostMessageMeta = {
   id: number

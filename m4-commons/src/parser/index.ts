@@ -18,26 +18,32 @@ export function parseMessage(m: Message): PostMessage {
   }
 
   // Forwarded
-  if (m.forward_from) {
-    // from user
+  if (m.forward_from_message_id) {
+    // 1. From a channel
+    base.forwarded = {
+      as: 'channel',
+      msgId: m.forward_from_message_id,
+      channel: m.forward_from_chat!,
+      sig: m.forward_signature,
+    }
+  } else if (m.forward_from_chat && !m.forward_from_message_id) {
+    // 2. From an anon (as a chanenl)
+    base.forwarded = {
+      as: 'anon',
+      channel: m.forward_from_chat,
+      sig: m.forward_signature,
+    }
+  } else if (m.forward_from) {
+    // 3. From a linked user
     base.forwarded = {
       as: 'user',
       user: m.forward_from,
     }
-  }
-  if (m.forward_from_message_id) {
-    // from channel
+  } else if (m.forward_sender_name) {
+    // 4. From an unlinked user
     base.forwarded = {
-      as: 'channel',
-      channel: m.forward_from_chat!,
-      id: m.forward_from_message_id,
-    }
-  }
-  if (m.forward_from_chat && !m.forward_from_message_id) {
-    // from anon
-    base.forwarded = {
-      as: 'anon',
-      channel: m.forward_from_chat,
+      as: 'anonuser',
+      name: m.forward_sender_name,
     }
   }
 
