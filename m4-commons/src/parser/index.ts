@@ -95,6 +95,33 @@ export function parseMessage(m: Message): PostMessage {
     return ret
   }
 
+  // Audio
+  if (m.audio) {
+    return {
+      ...base,
+      type: 'audio',
+      audio: m.audio,
+    }
+  }
+
+  // Document
+  if (m.document) {
+    return {
+      ...base,
+      type: 'document',
+      document: m.document,
+    }
+  }
+
+  // Video
+  if (m.video) {
+    return {
+      ...base,
+      type: 'video',
+      video: m.video,
+    }
+  }
+
   return {
     ...base,
     type: 'unknown',

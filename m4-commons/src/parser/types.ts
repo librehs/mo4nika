@@ -1,4 +1,11 @@
-import type { Chat, PhotoSize, User } from 'grammy/out/platform.node'
+import type {
+  Audio,
+  Chat,
+  PhotoSize,
+  User,
+  Document,
+  Video,
+} from 'grammy/out/platform.node'
 
 type ForwardUserInfo = {
   as: 'user'
@@ -61,6 +68,21 @@ export type PostMsgGallery = {
   photos: GallaryPhoto[]
 } & PostMessageMeta
 
+type PostMsgAudio = {
+  type: 'audio'
+  audio: Audio
+} & PostMessageMeta
+
+type PostMsgDocument = {
+  type: 'document'
+  document: Document
+} & PostMessageMeta
+
+type PostMsgVideo = {
+  type: 'video'
+  video: Video
+} & PostMessageMeta
+
 type PostMsgUnknown = {
   type: 'unknown'
   raw: any
@@ -70,4 +92,7 @@ export type PostMessage =
   | PostMsgText
   | PostMsgGallery
   | PostMsgPhoto
+  | PostMsgAudio
+  | PostMsgDocument
+  | PostMsgVideo
   | PostMsgUnknown
