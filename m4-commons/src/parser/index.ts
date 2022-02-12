@@ -47,6 +47,16 @@ export function parseMessage(m: Message): PostMessage {
     }
   }
 
+  // Reply to
+  if (m.reply_to_message) {
+    base.replyTo = m.reply_to_message.message_id
+  }
+
+  // Signature
+  if (m.author_signature) {
+    base.sig = m.author_signature
+  }
+
   // ----- Type ------
 
   // Text-only

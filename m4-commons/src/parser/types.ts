@@ -36,6 +36,8 @@ export type PostMessageMeta = {
   editDate?: Date
   tags: string[]
   forwarded?: ForwardInfo
+  replyTo?: number
+  sig?: string
 }
 
 type PostMsgText = {
