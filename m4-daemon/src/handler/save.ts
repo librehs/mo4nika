@@ -5,6 +5,8 @@ import Log from '@m4/commons/src/logger'
 import { parseMessage } from '@m4/commons/src/parser'
 const L = Log('save')
 
+const POSTS_COLECTION = 'posts'
+
 export default async function configureBot(bot: Bot, config: Config) {
   L.d('Configured.')
 
@@ -24,7 +26,7 @@ export default async function configureBot(bot: Bot, config: Config) {
     const parsedMsg = parseMessage(msg)
     const client = new MongoClient(save.url)
     await client.connect()
-    const coll = client.db().collection('posts')
+    const coll = client.db().collection(POSTS_COLECTION)
     await coll.insertOne(parsedMsg)
     await client.close()
 
@@ -38,7 +40,7 @@ export default async function configureBot(bot: Bot, config: Config) {
     const parsedMsg = parseMessage(msg)
     const client = new MongoClient(save.url)
     await client.connect()
-    const coll = client.db().collection('posts')
+    const coll = client.db().collection(POSTS_COLECTION)
     await coll.updateOne(
       { id: parsedMsg.id },
       {
