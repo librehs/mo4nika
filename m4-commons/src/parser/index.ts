@@ -1,5 +1,5 @@
 import type { Message } from 'grammy/out/platform.node'
-import type { PostMessage } from './types'
+import type { PostMessage, PostMsgGallery, PostMsgPhoto } from './types'
 import parseTextEntities from './textEntities'
 
 export function parseMessage(m: Message): PostMessage {
@@ -24,10 +24,9 @@ export function parseMessage(m: Message): PostMessage {
   }
   if (m.photo) {
     const { md, tags } = parseTextEntities(m.caption!, m.caption_entities ?? [])
-    return {
+    let ret: PostMsgPhoto | PostMsgGallery = {
       ...base,
-      type: 'gallary',
-      mediaGroupId: m.media_group_id!,
+      type: 'photo',
       photos: [
         {
           photo: m.photo,
@@ -36,6 +35,15 @@ export function parseMessage(m: Message): PostMessage {
       ],
       tags,
     }
+    if (m.media_group_id) {
+      // it's a gallery
+      ret = {
+        ...ret,
+        type: 'gallery',
+        mediaGroupId: m.media_group_id,
+      }
+    }
+    return ret
   }
 
   return {

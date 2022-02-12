@@ -18,8 +18,13 @@ type GallaryPhoto = {
   caption?: string
 }
 
-type PostMsgGallary = {
-  type: 'gallary'
+export type PostMsgPhoto = {
+  type: 'photo'
+  photos: GallaryPhoto[]
+} & PostMessageMeta
+
+export type PostMsgGallery = {
+  type: 'gallery'
   mediaGroupId: string
   photos: GallaryPhoto[]
 } & PostMessageMeta
@@ -29,4 +34,8 @@ type PostMsgUnknown = {
   raw: any
 } & PostMessageMeta
 
-export type PostMessage = PostMsgText | PostMsgGallary | PostMsgUnknown
+export type PostMessage =
+  | PostMsgText
+  | PostMsgGallery
+  | PostMsgPhoto
+  | PostMsgUnknown
