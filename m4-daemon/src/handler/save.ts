@@ -3,11 +3,13 @@ import type { Config } from '../types'
 
 import Log from '@m4/commons/src/logger'
 import { parseMessage } from '@m4/commons/src/parser'
+import {
+  POSTS_COLECTION,
+  MEDIA_GROUPS_COLLECTION,
+} from '@m4/commons/src/constants'
 import type { Message } from 'grammy/out/platform.node'
+import { PostMessage, MediaGroup } from '@m4/commons/src/types'
 const L = Log('save')
-
-const POSTS_COLECTION = 'posts'
-const MEDIA_GROUPS_COLLECTION = 'mediagroups'
 
 export default async function configureBot(bot: Bot, config: Config) {
   L.d('Configured.')
@@ -24,7 +26,7 @@ export default async function configureBot(bot: Bot, config: Config) {
     const parsedMsg = parseMessage(msg)
     const client = new MongoClient(save.url)
     await client.connect()
-    const $posts = client.db().collection(POSTS_COLECTION)
+    const $posts = client.db().collection<PostMessage>(POSTS_COLECTION)
     await $posts.updateOne(
       { id: parsedMsg.id },
       {
@@ -34,7 +36,9 @@ export default async function configureBot(bot: Bot, config: Config) {
     )
     if (parsedMsg.type === 'gallery') {
       const mediaGroupId = parsedMsg.mediaGroupId
-      const $mediaGroups = client.db().collection(MEDIA_GROUPS_COLLECTION)
+      const $mediaGroups = client
+        .db()
+        .collection<MediaGroup>(MEDIA_GROUPS_COLLECTION)
       if (newMsg) {
         await $mediaGroups.updateOne(
           { mediaGroupId },

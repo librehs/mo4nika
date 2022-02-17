@@ -96,3 +96,8 @@ export type PostMessage =
   | PostMsgDocument
   | PostMsgVideo
   | PostMsgUnknown
+
+export type MediaGroup = {
+  mediaGroupId: string
+  items: (PostMsgGallery | PostMsgPhoto)[]
+}

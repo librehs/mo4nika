@@ -45,3 +45,5 @@ export interface ResultFailure {
 export interface Sender {
   sendMessage: (m: Message) => Promise<Result>
 }
+
+export * from './parser/types'
