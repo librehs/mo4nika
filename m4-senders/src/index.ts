@@ -23,9 +23,13 @@ async function main() {
     L.cr()('Database config not found, quiting')
     process.exit(1)
   }
+  if (!config.channel) {
+    L.cr()('Channel config not found, quiting')
+    process.exit(1)
+  }
 
   if (config?.misskey?.enabled) {
-    await misskeyUpdate(config.misskey, config.db)
+    await misskeyUpdate(config.misskey, config as Config)
   }
 }
 

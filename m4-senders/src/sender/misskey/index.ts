@@ -1,4 +1,4 @@
-import type { DbConfig, MisskeyConfig } from '../../types'
+import type { Config, DbConfig, MisskeyConfig } from '../../types'
 import type { PostMessage, MediaGroup } from '@m4/commons/src/types'
 import {
   POSTS_COLECTION,
@@ -18,7 +18,8 @@ type RuntimeConfig = {
 
 const SENDER_KEY: Partial<RuntimeConfig> = { key: 0 }
 
-async function update(conf: MisskeyConfig, db: DbConfig) {
+async function update(conf: MisskeyConfig, glob: Config) {
+  const db: DbConfig = glob.db
   if (db.db !== 'mongodb') {
     L.cr()(`Invalid db type: ${db.db}`)
   }
@@ -71,7 +72,7 @@ async function update(conf: MisskeyConfig, db: DbConfig) {
     L.d(`Processing message #${next.id}`)
     if (Number(now) - Number(next.date) <= sendAfterSeconds * 1000) break
 
-    await sendNote(api, next)
+    await sendNote(api, next, glob.channel.username)
     alreadySentMessage++
     lastMessageId = next.id
 

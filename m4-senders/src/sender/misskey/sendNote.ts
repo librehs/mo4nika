@@ -4,7 +4,11 @@ import type MisskeyApi from './misskeyApi'
 import Log from '@m4/commons/src/logger'
 const L = Log('misskey')
 
-export default async function sendNote(api: MisskeyApi, msg: PostMessage) {
+export default async function sendNote(
+  api: MisskeyApi,
+  msg: PostMessage,
+  username: string
+) {
   if (['unknown', 'document', 'audio', 'video'].includes(msg.type)) {
     L.w(`Unrecognized message type "${msg.type}", skipping`)
     return
@@ -19,7 +23,7 @@ export default async function sendNote(api: MisskeyApi, msg: PostMessage) {
 
   await api.createNote({
     visibility: 'public',
-    text,
+    text: text + '\n\n' + `[Telegram 原文](https://t.me/${username}/${msg.id})`,
   })
 }
 

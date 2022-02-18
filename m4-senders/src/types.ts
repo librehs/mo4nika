@@ -3,6 +3,10 @@ export type DbConfig = {
   url: string
 }
 
+type ChannelInfo = {
+  username: string
+}
+
 export type MisskeyConfig = {
   enabled: boolean
   domain: string
@@ -15,5 +19,6 @@ export type MisskeyConfig = {
 
 export type Config = {
   db: DbConfig
+  channel: ChannelInfo
   misskey?: MisskeyConfig
 }
