@@ -46,6 +46,23 @@ const msg = {
   },
 }
 
+const urlTextLinkMsg = {
+  caption: 'p1 https://t.co\np2 t.tt\np3 sample\np4 sample',
+  caption_entities: [
+    { offset: 3, length: 12, type: 'url' },
+    { offset: 19, length: 4, type: 'url' },
+    { offset: 27, length: 7, type: 'text_link', url: 'http://t.tt/' },
+    { offset: 37, length: 6, type: 'text_link', url: 'https://t.tt/' },
+  ],
+  target: {
+    md:
+      'p1 [https://t.co](https://t.co)\n' +
+      'p2 [t.tt](http://t.tt)\n' +
+      'p3 [sample](http://t.tt/)\n' +
+      'p4 [sample](https://t.tt/)',
+  },
+}
+
 describe('parseTextEntities', () => {
   it('can parse mixed text', () => {
     const ret = parseTextEntities(
@@ -54,5 +71,13 @@ describe('parseTextEntities', () => {
     )
     expect(ret.md).to.be.deep.eq(msg.target.md)
     expect(ret.tags).to.be.eq(ret.tags)
+  })
+
+  it('can parse url and text_link', () => {
+    const ret = parseTextEntities(
+      urlTextLinkMsg.caption,
+      urlTextLinkMsg.caption_entities as MessageEntity[]
+    )
+    expect(ret.md).to.be.deep.eq(urlTextLinkMsg.target.md)
   })
 })

@@ -18,7 +18,7 @@ export default function parseTextEntities(
     switch (i.type) {
       // Links
       case 'url': {
-        mid = `[${mid}](${mid})`
+        mid = `[${mid}](${toValidUrl(mid)})`
         break
       }
       case 'email': {
@@ -88,4 +88,18 @@ export default function parseTextEntities(
     md: ret,
     tags,
   }
+}
+
+function isValidUrl(url: string): boolean {
+  try {
+    new URL(url)
+    return true
+  } catch (_) {
+    return false
+  }
+}
+
+function toValidUrl(url: string) {
+  if (isValidUrl(url)) return url
+  return 'http://' + url
 }
