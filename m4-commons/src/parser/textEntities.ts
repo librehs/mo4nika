@@ -11,9 +11,9 @@ export default function parseTextEntities(
     const aft = ret.slice(i.offset + i.length)
     let mid = ret.slice(i.offset, i.offset + i.length)
 
-    const tailBr = mid.match(/\n$/) !== null ? '\n' : ''
-    const headBr = mid.match(/^\n/) !== null ? '\n' : ''
-    mid = mid.replace(/^\n/, '').replace(/\n$/, '')
+    const tailBr = mid.match(/\n+$/) !== null ? mid.match(/\n+$/)![0] : ''
+    const headBr = mid.match(/^\n+/) !== null ? mid.match(/^\n+/)![0] : ''
+    mid = mid.replace(/^\n+/, '').replace(/\n+$/, '')
 
     switch (i.type) {
       // Links
@@ -53,11 +53,13 @@ export default function parseTextEntities(
       }
       case 'code': {
         const multiLine = mid.includes('\n')
-        mid = multiLine ? '```\n' + mid + '```\n' : '`' + mid + '`'
+        mid = multiLine //
+          ? '```\n' + mid + '\n```'
+          : '`' + mid + '`'
         break
       }
       case 'pre': {
-        mid = '```\n' + mid + '```\n'
+        mid = '```\n' + mid + '\n```'
         break
       }
 
