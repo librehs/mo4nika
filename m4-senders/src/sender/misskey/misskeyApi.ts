@@ -13,7 +13,8 @@ type CreateNoteRequest = {
   visibility: NoteVisibility
   text: string
   cw?: string
-  fileIds: string[]
+  // it's actually nullable (and should be undefined on cases with no files)
+  fileIds?: string[]
   replyId?: string
   renoteId?: string
 }
