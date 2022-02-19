@@ -7,7 +7,7 @@ import {
 } from '@m4/commons/src/constants'
 import MisskeyApi from './misskeyApi'
 import Log from '@m4/commons/src/logger'
-import sendNote from './sendNote'
+import { sendNote } from './sendNote'
 
 const L = Log('misskey')
 
@@ -36,7 +36,9 @@ async function update(conf: MisskeyConfig, glob: Config) {
   const $mediaGroups = client
     .db()
     .collection<MediaGroup>(MEDIA_GROUPS_COLLECTION)
-  const $sender = client.db().collection<RuntimeConfig>(SENDER_PREFIX)
+  const $sender = client
+    .db()
+    .collection<RuntimeConfig>(SENDER_PREFIX + 'misskey')
   L.i(`Database connected`)
 
   const fromMessageId = (await $sender.findOne(SENDER_KEY))?.lastMessageId ?? -1
@@ -70,9 +72,32 @@ async function update(conf: MisskeyConfig, glob: Config) {
       break
     }
     L.d(`Processing message #${next.id}`)
-    if (Number(now) - Number(next.date) <= sendAfterSeconds * 1000) break
+    if (Number(now) - Number(next.date) <= sendAfterSeconds * 1000) {
+      L.d('Message too young, quitting')
+      break
+    }
 
-    await sendNote(api, next, glob.channel.username)
+    if (next.type === 'gallery') {
+      const msgGroup = await $mediaGroups.findOne({
+        mediaGroupId: next.mediaGroupId,
+      })
+      if (!msgGroup) {
+        L.e(`Message group #${next.mediaGroupId} not found, skipping`)
+        continue
+      }
+      const msgs = msgGroup.items
+      if (
+        msgs.filter(
+          (x) => Number(now) - Number(x.date) <= sendAfterSeconds * 1000
+        ).length > 0
+      ) {
+        L.d('Some messages in the message group too young, quitting')
+        break
+      }
+      await sendNote(api, msgs, glob)
+    } else {
+      await sendNote(api, [next], glob)
+    }
     alreadySentMessage++
     lastMessageId = next.id
 

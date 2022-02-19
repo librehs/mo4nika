@@ -7,6 +7,8 @@ import type {
   Video,
 } from 'grammy/out/platform.node'
 
+export type TgPhotoSize = PhotoSize
+
 type ForwardUserInfo = {
   as: 'user'
   user: User
@@ -36,6 +38,13 @@ type ForwardInfo =
   | ForwardAnonInfo
   | ForwardAnonUserInfo
 
+type PostMessageExternalMeta = {
+  misskey: {
+    id: string
+    uri: string
+  }
+}
+
 export type PostMessageMeta = {
   id: number
   type: string
@@ -45,7 +54,7 @@ export type PostMessageMeta = {
   forwarded?: ForwardInfo
   replyTo?: number
   sig?: string
-}
+} & Partial<PostMessageExternalMeta>
 
 type PostMsgText = {
   type: 'text'
@@ -59,13 +68,13 @@ type GallaryPhoto = {
 
 export type PostMsgPhoto = {
   type: 'photo'
-  photos: GallaryPhoto[]
+  photo: GallaryPhoto
 } & PostMessageMeta
 
 export type PostMsgGallery = {
   type: 'gallery'
   mediaGroupId: string
-  photos: GallaryPhoto[]
+  photo: GallaryPhoto
 } & PostMessageMeta
 
 type PostMsgAudio = {

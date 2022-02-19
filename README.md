@@ -9,12 +9,13 @@ Mo4nika = Message Outpost for New Information Kollection Agent
 * [x] Collect messages from Telegram
 * [x] Accept commands from Telegram, to:
   * Deploy messages  
-* [ ] Listen to updates on Telegram channels, to:
+* [x] Listen to updates on Telegram channels, to:
   * Edit messages
-  * Delete messages
+  * ~~Delete messages~~
 
 ## Supported Destination
 
 * [x] Telegram Channel
 * [ ] GitHub
-* [ ] ActivityPub
+* [x] ActivityPub
+  * [x] Photos

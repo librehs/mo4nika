@@ -76,12 +76,11 @@ export function parseMessage(m: Message): PostMessage {
     let ret: PostMsgPhoto | PostMsgGallery = {
       ...base,
       type: 'photo',
-      photos: [
-        {
-          photo: m.photo,
-          caption: md,
-        },
-      ],
+      photo: {
+        photo: m.photo,
+        caption: md,
+      },
+
       tags,
     }
     if (m.media_group_id) {

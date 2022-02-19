@@ -5,6 +5,7 @@ export type DbConfig = {
 
 type ChannelInfo = {
   username: string
+  token?: string
 }
 
 export type MisskeyConfig = {

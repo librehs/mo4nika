@@ -1,4 +1,5 @@
 import got from 'got'
+import FormData from 'form-data'
 import type { Got } from 'got'
 
 type GetMe = {
@@ -9,7 +10,7 @@ type GetMe = {
 
 type NoteVisibility = 'public' | 'home' | 'followers'
 
-type CreateNoteRequest = {
+export type CreateNoteRequest = {
   visibility: NoteVisibility
   text: string
   cw?: string
@@ -37,6 +38,16 @@ type CreateNoteResponse = {
   }
 }
 
+type File = {
+  id: string
+  createdAt: string
+  name: string
+  type: string
+  isSensitive: boolean
+  blurhash: string
+  comment: string
+}
+
 export default class MisskeyApi {
   #api: Got
   #auth: { i: string }
@@ -44,7 +55,6 @@ export default class MisskeyApi {
   constructor(domain: string, token: string) {
     this.#api = got.extend({
       prefixUrl: `https://${domain}/api/`,
-
       responseType: 'json',
     })
     this.#auth = { i: token }
@@ -66,7 +76,27 @@ export default class MisskeyApi {
       .then((x) => x.body) as Promise<CreateNoteResponse>
   }
 
-  createFile(filename: string, file: ReadableStream) {
-    throw Error('Not implemented')
+  createFile(filename: string, file: Buffer, contentType: string) {
+    const fd = new FormData()
+    fd.append('name', filename)
+    fd.append('force', 'true')
+    fd.append('file', file, {
+      filename,
+      knownLength: file.length,
+    })
+    fd.append('i', this.#auth.i)
+    return this.#api
+      .post('drive/files/create', {
+        body: fd,
+      })
+      .then((x) => x.body) as Promise<File>
+  }
+
+  editFileComment(fileId: string, comment: string) {
+    return this.#api
+      .post('drive/files/update', {
+        json: { fileId, comment, ...this.#auth },
+      })
+      .then((x) => x.body) as Promise<File>
   }
 }

@@ -1,30 +1,74 @@
-import type { PostMessage } from '@m4/commons/src/types'
+import type {
+  PostMessage,
+  PostMsgPhoto,
+  TgPhotoSize,
+} from '@m4/commons/src/types'
 import type MisskeyApi from './misskeyApi'
+import { Config } from '../../types'
+import got from 'got'
+import { nanoid } from 'nanoid'
 
 import Log from '@m4/commons/src/logger'
+import { CreateNoteRequest } from './misskeyApi'
 const L = Log('misskey')
 
-export default async function sendNote(
+export async function sendNote(
   api: MisskeyApi,
-  msg: PostMessage,
-  username: string
+  msges: PostMessage[],
+  glob: Config
 ) {
-  if (['unknown', 'document', 'audio', 'video'].includes(msg.type)) {
-    L.w(`Unrecognized message type "${msg.type}", skipping`)
+  const username = glob.channel.username
+  const token = glob.channel.token
+  if (msges.length === 0) return
+  if (
+    msges.filter((msg) =>
+      ['unknown', 'document', 'audio', 'video'].includes(msg.type)
+    ).length > 0
+  ) {
+    L.w(`Unrecognized message type found, skipping`)
     return
   }
-  const text = getText(msg)
-  switch (msg.type) {
-    case 'gallery':
-    case 'photo': {
-      // TODO
-    }
+  const firstMsg = msges[0]
+  const lastMsg = msges[msges.length - 1]
+  const text = getText(lastMsg)
+  const containsPhoto = firstMsg.type === 'photo' || firstMsg.type === 'gallery'
+  const images = containsPhoto
+    ? msges.map((x) => (x as PostMsgPhoto).photo)
+    : []
+  const finishedImages = token
+    ? await Promise.all(
+        images.map(async (x, i) =>
+          uploadAndCommentImage(
+            x.photo,
+            // for the last photo, the caption is not added to the photo but to the note
+            i !== images.length - 1 ? x.caption : undefined,
+            api,
+            token
+          )
+        )
+      )
+    : []
+  if (images.length > 0 && !token) {
+    L.w('Images found but bot token not found, ignoring images')
+  }
+  if (finishedImages.length > 0) {
+    L.d(`${finishedImages.length} images uploaded`)
   }
 
-  await api.createNote({
+  const note: Pick<CreateNoteRequest, 'visibility' | 'text'> &
+    Partial<CreateNoteRequest> = {
     visibility: 'public',
-    text: text + '\n\n' + `[Telegram 原文](https://t.me/${username}/${msg.id})`,
-  })
+    text:
+      text +
+      '\n\n' +
+      `[Telegram 原文](https://t.me/${username}/${firstMsg.id})`,
+  }
+
+  if (finishedImages.length) {
+    note.fileIds = finishedImages
+  }
+
+  await api.createNote(note)
 }
 
 function getText(msg: PostMessage): string {
@@ -33,13 +77,53 @@ function getText(msg: PostMessage): string {
       return msg.text
     }
     case 'photo': {
-      return msg.photos[0].caption!
+      return msg.photo.caption!
     }
     case 'gallery': {
-      return msg.photos[msg.photos.length - 1].caption!
+      return msg.photo.caption!
     }
     default: {
       throw Error('unreachable')
     }
   }
+}
+
+async function uploadAndCommentImage(
+  photo: TgPhotoSize[],
+  caption: string | undefined,
+  misskeyApi: MisskeyApi,
+  token: string
+): Promise<string> {
+  const bestPhoto = photo.sort((a, b) => b.width - a.width)[0]
+  const resp = await got
+    .post(`https://api.telegram.org/bot${token}/getFile`, {
+      json: {
+        file_id: bestPhoto.file_id,
+      },
+      responseType: 'json',
+    })
+    .then((x) => x.body)
+  const filePath = (resp as any).result.file_path
+  const ext = filePath.match(/\..+$/)[0]
+  const imageBuf = await got
+    .get(`https://api.telegram.org/file/bot${token}/${filePath}`)
+    .buffer()
+  const filename = nanoid(8) + ext
+  const mkFile = await misskeyApi.createFile(
+    filename,
+    imageBuf,
+    guessMimeType(ext)
+  )
+  if (caption) await misskeyApi.editFileComment(mkFile.id, caption)
+  return mkFile.id
+}
+
+function guessMimeType(ext: string): string {
+  switch (ext) {
+    case '.jpg':
+    case '.jpeg': {
+      return ''
+    }
+  }
+  return ''
 }

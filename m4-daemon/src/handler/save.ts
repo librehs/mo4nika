@@ -76,6 +76,7 @@ export default async function configureBot(bot: Bot, config: Config) {
   bot.on('channel_post', async (ctx) => {
     let msg = ctx.channelPost
     if (!msg) return
+    L.d(msg)
     if (msg.sender_chat?.id !== channelId) return
     await saveMessage(msg, true)
     L.d(`Saved #${msg.message_id}`)
@@ -83,6 +84,7 @@ export default async function configureBot(bot: Bot, config: Config) {
   bot.on('edited_channel_post', async (ctx) => {
     let msg = ctx.editedChannelPost
     if (!msg) return
+    L.d(msg)
     if (msg.sender_chat?.id !== channelId) return
     await saveMessage(msg, false)
     L.d(`Edited #${msg.message_id}`)
