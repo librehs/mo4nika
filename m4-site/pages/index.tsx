@@ -28,7 +28,7 @@ const Home = ({
           setItems(x.data)
         }
       })
-  }, ['pageNumber'])
+  }, [pageNumber])
 
   return (
     <div id="app">
@@ -40,7 +40,7 @@ const Home = ({
           Atlas for <b>@{Global.name}</b>
         </h1>
       </header>
-      <table className="mt-3 mx-3 border-collapse border-slate-300 bg-white rounded">
+      <table className="mt-3 mx-auto border-collapse border-slate-300 bg-white rounded container">
         <thead className="bg-slate-200">
           <tr className="msgTable">
             <th>#</th>
@@ -68,6 +68,30 @@ const Home = ({
           ))}
         </tbody>
       </table>
+      <div className="round text-center mb-3 flex items-center justify-center">
+        {pageNumber > 1 && (
+          <button
+            className="rounded-xl bg-sky-300 m-1 p-2"
+            tabIndex={0}
+            onClick={() => setPageNumber(pageNumber - 1)}
+          >
+            Last
+          </button>
+        )}
+        <div className="bg-sky-500 m-1 p-2 rounded-xl text-white">
+          Page {pageNumber}
+          {items.length
+            ? ` (#${items[items.length - 1].id} - #${items[0].id})`
+            : ''}
+        </div>
+        <button
+          className="rounded-xl bg-sky-300 m-1 p-2"
+          tabIndex={0}
+          onClick={() => setPageNumber(pageNumber + 1)}
+        >
+          Next
+        </button>
+      </div>
     </div>
   )
 }

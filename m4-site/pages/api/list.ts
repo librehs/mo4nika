@@ -15,7 +15,7 @@ export default async function handler(
     query: { page: _page, perpage: _perpage },
   } = req
 
-  const page = Math.min(toNumber(_page, 1), 1)
+  const page = Math.max(toNumber(_page, 1), 1)
   const perpage = toNumber(_perpage, 15)
 
   const data = await query(page, perpage).catch((e) => {
