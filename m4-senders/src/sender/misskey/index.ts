@@ -1,7 +1,7 @@
 import type { Config, DbConfig, MisskeyConfig } from '../../types'
 import type { PostMessage, MediaGroup } from '@m4/commons/src/types'
 import {
-  POSTS_COLECTION,
+  POSTS_COLLECTION,
   MEDIA_GROUPS_COLLECTION,
   SENDER_PREFIX,
 } from '@m4/commons/src/constants'
@@ -32,7 +32,7 @@ async function update(conf: MisskeyConfig, glob: Config) {
   const me = await api.getMe()
   L.i(`Misskey connected: ${me.username}`)
 
-  const $posts = client.db().collection<PostMessage>(POSTS_COLECTION)
+  const $posts = client.db().collection<PostMessage>(POSTS_COLLECTION)
   const $mediaGroups = client
     .db()
     .collection<MediaGroup>(MEDIA_GROUPS_COLLECTION)

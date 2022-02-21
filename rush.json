@@ -152,6 +152,10 @@
     {
       "packageName": "@m4/worker",
       "projectFolder": "m4-worker"
+    },
+    {
+      "packageName": "@m4/site",
+      "projectFolder": "m4-site"
     }
   ]
 }

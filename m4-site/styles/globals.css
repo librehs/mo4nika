@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+a {
+  @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-500;
+}
+
+th {
+  @apply py-6;
+}
+
+td {
+  @apply p-4;
+}
+
+tr:nth-child(even) {
+  @apply bg-slate-100;
+}
