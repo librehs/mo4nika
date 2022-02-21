@@ -3,7 +3,7 @@ type Config = {
 }
 
 const Global: Config = {
-  name: process.env.NEXT_PUBLIC_M4_SITE_NAME ?? 'Mo4nika',
+  name: process.env.NEXT_PUBLIC_USERNAME ?? 'Mo4nika',
 }
 
 export default Global

@@ -1,0 +1,49 @@
+@font-face {
+  font-family: 'FaBrands';
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-brands-400.woff2')
+      format('woff2'),
+    url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-brands-400.ttf')
+      format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* https://FaBrands.com/v5/cheatsheet/free/brands#use */
+
+/* Emojis */
+
+.tag[data-tagname='Birthday']::after {
+  content: '🎂';
+}
+
+/* FA Icons */
+
+.tag[data-tagname='AWS']::after {
+  font-family: 'FaBrands';
+  content: ' \f375';
+}
+
+.tag[data-tagname='Google']::after {
+  font-family: 'FaBrands';
+  content: ' \f1a0';
+}
+
+.tag[data-tagname='GoogleDrive']::after {
+  font-family: 'FaBrands';
+  content: ' \f3aa';
+}
+
+.tag[data-tagname='Microsoft']::after {
+  font-family: 'FaBrands';
+  content: ' \f3ca';
+}
+
+.tag[data-tagname='Windows']::after {
+  font-family: 'FaBrands';
+  content: ' \f17a';
+}
+
+.tag[data-tagname='YouTube']::after {
+  font-family: 'FaBrands';
+  content: ' \f167';
+}

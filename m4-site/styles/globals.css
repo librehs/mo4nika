@@ -17,3 +17,14 @@ td {
 tr:nth-child(even) {
   @apply bg-slate-100;
 }
+
+.iframeBody {
+  height: 22rem;
+}
+
+.msgTable {
+  display: grid;
+  grid-template-columns: 1fr 6fr 3fr;
+}
+
+@import './tags.css';
