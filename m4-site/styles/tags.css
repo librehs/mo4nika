@@ -1,4 +1,14 @@
 @font-face {
+  font-family: 'FaSolid';
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.woff2')
+      format('woff2'),
+    url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.ttf')
+      format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
   font-family: 'FaBrands';
   src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-brands-400.woff2')
       format('woff2'),
@@ -8,7 +18,7 @@
   font-style: normal;
 }
 
-/* https://FaBrands.com/v5/cheatsheet/free/brands#use */
+/* https://fontawesome.com/v5/cheatsheet/free/brands#use */
 
 /* Emojis */
 
@@ -16,11 +26,21 @@
   content: '🎂';
 }
 
-/* FA Icons */
+/* FaBrands */
+
+.tag[data-tagname='Apple']::after {
+  font-family: 'FaBrands';
+  content: ' \f179';
+}
 
 .tag[data-tagname='AWS']::after {
   font-family: 'FaBrands';
   content: ' \f375';
+}
+
+.tag[data-tagname='GitHub']::after {
+  font-family: 'FaBrands';
+  content: ' \f09b';
 }
 
 .tag[data-tagname='Google']::after {
@@ -33,9 +53,24 @@
   content: ' \f3aa';
 }
 
+.tag[data-tagname='Linode']::after {
+  font-family: 'FaBrands';
+  content: ' \f2b8';
+}
+
 .tag[data-tagname='Microsoft']::after {
   font-family: 'FaBrands';
   content: ' \f3ca';
+}
+
+.tag[data-tagname='npm']::after {
+  font-family: 'FaBrands';
+  content: ' \f3d4';
+}
+
+.tag[data-tagname='Rust']::after {
+  font-family: 'FaBrands';
+  content: ' \e07a';
 }
 
 .tag[data-tagname='Windows']::after {
@@ -46,4 +81,32 @@
 .tag[data-tagname='YouTube']::after {
   font-family: 'FaBrands';
   content: ' \f167';
+}
+
+/* FaSolid */
+
+.tag[data-tagname='Acquirement']::after {
+  font-family: 'FaSolid';
+  content: ' \f1ad';
+}
+
+.tag[data-tagname^='CVE']::after {
+  font-family: 'FaSolid';
+  content: ' \f023';
+  @apply text-red-700;
+}
+
+.tag[data-tagname^='Print']::after {
+  font-family: 'FaSolid';
+  content: ' \f02f';
+}
+
+.tag[data-tagname='Privacy']::after {
+  font-family: 'FaSolid';
+  content: ' \f6fa';
+}
+
+.tag[data-tagname='Security']::after {
+  font-family: 'FaSolid';
+  content: ' \f3ed';
 }
