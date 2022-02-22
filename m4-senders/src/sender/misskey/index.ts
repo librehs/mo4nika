@@ -77,6 +77,7 @@ async function update(conf: MisskeyConfig, glob: Config) {
       break
     }
 
+    let noteLink
     if (next.type === 'gallery') {
       const msgGroup = await $mediaGroups.findOne({
         mediaGroupId: next.mediaGroupId,
@@ -94,14 +95,25 @@ async function update(conf: MisskeyConfig, glob: Config) {
         L.d('Some messages in the message group too young, quitting')
         break
       }
-      await sendNote(api, msgs, glob)
+      noteLink = await sendNote(api, msgs, glob)
     } else {
-      await sendNote(api, [next], glob)
+      noteLink = await sendNote(api, [next], glob)
     }
     alreadySentMessage++
     lastMessageId = next.id
 
     L.d(`Sent message #${next.id}`)
+
+    if (noteLink) {
+      await $posts.updateOne(
+        { id: next.id },
+        {
+          $set: {
+            misskey: noteLink,
+          },
+        }
+      )
+    }
   }
 
   L.i(`Messages up to #${lastMessageId} has been sent`)

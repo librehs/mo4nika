@@ -68,7 +68,11 @@ export async function sendNote(
     note.fileIds = finishedImages
   }
 
-  await api.createNote(note)
+  const crNote = await api.createNote(note)
+  return {
+    id: crNote.createdNote.id,
+    url: crNote.createdNote.url!,
+  }
 }
 
 function getText(msg: PostMessage): string {

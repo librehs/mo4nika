@@ -41,7 +41,7 @@ type ForwardInfo =
 type PostMessageExternalMeta = {
   misskey: {
     id: string
-    uri: string
+    url: string
   }
 }
 
