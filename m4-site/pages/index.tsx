@@ -53,6 +53,18 @@ const Home = ({
             <tr key={key} className="msgTable">
               <td className="text-blue-600">
                 <a href={`https://t.me/${Global.name}/${item.id}`}>{item.id}</a>
+                {Global.misskeyDomain && item.misskey && (
+                  <>
+                    <br />
+                    <a
+                      href={`https://${Global.misskeyDomain}/notes/${item.misskey.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      (Misskey)
+                    </a>
+                  </>
+                )}
               </td>
               <td>
                 <div className="overflow-y-scroll iframeBody">
