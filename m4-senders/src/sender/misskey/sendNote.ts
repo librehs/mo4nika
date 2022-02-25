@@ -55,13 +55,38 @@ export async function sendNote(
     L.d(`${finishedImages.length} images uploaded`)
   }
 
+  const messageMetaLine = [
+    `[Telegram 原文](https://t.me/${username}/${firstMsg.id})`,
+  ]
+
+  if (firstMsg.forwarded) {
+    const fwd = firstMsg.forwarded
+    switch (fwd.as) {
+      case 'channel': {
+        const ch = fwd.channel
+        const srcTitle = ch.type === 'channel' ? ch.title : '消息来源'
+        const srcLink =
+          ch.type === 'channel' && ch.username
+            ? `https://t.me/${ch.username}/${fwd.msgId}`
+            : null
+        messageMetaLine.push(
+          srcLink ? `转发自[${srcTitle}](${srcLink})` : '来自转发'
+        )
+        break
+      }
+      case 'anon':
+      case 'user':
+      case 'anonuser': {
+        messageMetaLine.push('来自转发')
+        break
+      }
+    }
+  }
+
   const note: Pick<CreateNoteRequest, 'visibility' | 'text'> &
     Partial<CreateNoteRequest> = {
     visibility: 'public',
-    text:
-      text +
-      '\n\n' +
-      `[Telegram 原文](https://t.me/${username}/${firstMsg.id})`,
+    text: text + '\n\n' + messageMetaLine.join(' | '),
   }
 
   if (finishedImages.length) {
