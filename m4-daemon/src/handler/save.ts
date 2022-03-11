@@ -4,7 +4,7 @@ import type { Config } from '../types'
 import Log from '@m4/commons/src/logger'
 import { parseMessage } from '@m4/commons/src/parser'
 import {
-  POSTS_COLECTION,
+  POSTS_COLLECTION,
   MEDIA_GROUPS_COLLECTION,
 } from '@m4/commons/src/constants'
 import type { Message } from 'grammy/out/platform.node'
@@ -26,7 +26,7 @@ export default async function configureBot(bot: Bot, config: Config) {
     const parsedMsg = parseMessage(msg)
     const client = new MongoClient(save.url)
     await client.connect()
-    const $posts = client.db().collection<PostMessage>(POSTS_COLECTION)
+    const $posts = client.db().collection<PostMessage>(POSTS_COLLECTION)
     await $posts.updateOne(
       { id: parsedMsg.id },
       {
