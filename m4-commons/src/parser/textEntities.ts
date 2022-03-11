@@ -1,90 +1,112 @@
 import type { MessageEntity } from 'grammy/out/platform.node'
 
+export function parseTextSegment(
+  rawText: string,
+  typ: string,
+  uid: string | undefined,
+  url: string | undefined
+): {
+  text: string
+  tags: string[]
+} {
+  const tags: string[] = []
+  const tailBr = rawText.match(/\n+$/) !== null ? rawText.match(/\n+$/)![0] : ''
+  const headBr = rawText.match(/^\n+/) !== null ? rawText.match(/^\n+/)![0] : ''
+  rawText = rawText.replace(/^\n+/, '').replace(/\n+$/, '')
+
+  switch (typ) {
+    // Links
+    case 'url': {
+      rawText = `[${rawText}](${toValidUrl(rawText)})`
+      break
+    }
+    case 'email': {
+      rawText = `[${rawText}](mailto:${rawText})`
+      break
+    }
+    case 'phone_number': {
+      rawText = `[${rawText}](tel:${rawText})`
+      break
+    }
+
+    // Formatting
+    case 'bold': {
+      rawText = '**' + rawText + '**'
+      break
+    }
+    case 'italic': {
+      rawText = '*' + rawText + '*'
+      break
+    }
+    case 'underline': {
+      // not implemented yet
+      break
+    }
+    case 'strikethrough': {
+      rawText = '~~' + rawText + '~~'
+      break
+    }
+    case 'spoiler': {
+      // not implemented yet
+      break
+    }
+    case 'code': {
+      const multiLine = rawText.includes('\n')
+      rawText = multiLine //
+        ? '```\n' + rawText + '\n```'
+        : '`' + rawText + '`'
+      break
+    }
+    case 'pre': {
+      rawText = '```\n' + rawText + '\n```'
+      break
+    }
+
+    case 'text_link': {
+      rawText = `[${rawText}](${url})`
+      break
+    }
+    case 'text_mention': {
+      rawText = `[${rawText}](tg://user?id=${uid})`
+      break
+    }
+
+    case 'hashtag': {
+      tags.push(rawText.replace(/^#/, ''))
+    }
+
+    case 'mention':
+    case 'cashtag':
+    case 'bot_command': {
+      // Nothing needed
+      break
+    }
+  }
+  return {
+    text: headBr + rawText + tailBr,
+    tags,
+  }
+}
+
 export default function parseTextEntities(
   text: string,
   entities: MessageEntity[]
 ): { md: string; tags: string[] } {
   let ret = text
-  const tags: string[] = []
+  let tags: string[] = []
   for (const i of entities.sort((x, y) => y.offset - x.offset)) {
     const bef = ret.slice(0, i.offset)
     const aft = ret.slice(i.offset + i.length)
     let mid = ret.slice(i.offset, i.offset + i.length)
 
-    const tailBr = mid.match(/\n+$/) !== null ? mid.match(/\n+$/)![0] : ''
-    const headBr = mid.match(/^\n+/) !== null ? mid.match(/^\n+/)![0] : ''
-    mid = mid.replace(/^\n+/, '').replace(/\n+$/, '')
-
-    switch (i.type) {
-      // Links
-      case 'url': {
-        mid = `[${mid}](${toValidUrl(mid)})`
-        break
-      }
-      case 'email': {
-        mid = `[${mid}](mailto:${mid})`
-        break
-      }
-      case 'phone_number': {
-        mid = `[${mid}](tel:${mid})`
-        break
-      }
-
-      // Formatting
-      case 'bold': {
-        mid = '**' + mid + '**'
-        break
-      }
-      case 'italic': {
-        mid = '*' + mid + '*'
-        break
-      }
-      case 'underline': {
-        // not implemented yet
-        break
-      }
-      case 'strikethrough': {
-        mid = '~~' + mid + '~~'
-        break
-      }
-      case 'spoiler': {
-        // not implemented yet
-        break
-      }
-      case 'code': {
-        const multiLine = mid.includes('\n')
-        mid = multiLine //
-          ? '```\n' + mid + '\n```'
-          : '`' + mid + '`'
-        break
-      }
-      case 'pre': {
-        mid = '```\n' + mid + '\n```'
-        break
-      }
-
-      case 'text_link': {
-        mid = `[${mid}](${i.url})`
-        break
-      }
-      case 'text_mention': {
-        mid = `[${mid}](tg://user?id=${i.user.id})`
-        break
-      }
-
-      case 'hashtag': {
-        tags.push(mid.replace(/^#/, ''))
-      }
-
-      case 'mention':
-      case 'cashtag':
-      case 'bot_command': {
-        // Nothing needed
-        break
-      }
-    }
-
-    ret = bef + headBr + mid + tailBr + aft
+    const { text, tags: _tags } = parseTextSegment(
+      mid,
+      i.type,
+      (i as any).user?.id,
+      (i as any).url
+    )
+    tags = tags.concat(_tags)
+    ret = bef + text + aft
   }
   return {
     md: ret,

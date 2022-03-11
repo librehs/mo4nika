@@ -26,7 +26,7 @@
    * Specify one of: "pnpmVersion", "npmVersion", or "yarnVersion".  See the Rush documentation
    * for details about these alternatives.
    */
-  "pnpmVersion": "6.31.0",
+  "pnpmVersion": "6.32.3",
 
   // "npmVersion": "6.14.15",
   // "yarnVersion": "1.9.4",
@@ -156,6 +156,10 @@
     {
       "packageName": "@m4/site",
       "projectFolder": "m4-site"
+    },
+    {
+      "packageName": "@m4/importer",
+      "projectFolder": "m4-importer"
     }
   ]
 }

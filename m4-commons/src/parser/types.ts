@@ -54,9 +54,10 @@ export type PostMessageMeta = {
   forwarded?: ForwardInfo
   replyTo?: number
   sig?: string
+  isImported?: boolean
 } & Partial<PostMessageExternalMeta>
 
-type PostMsgText = {
+export type PostMsgText = {
   type: 'text'
   text: string
 } & PostMessageMeta
