@@ -59,6 +59,8 @@ export async function sendNote(
     `[Telegram 原文](https://t.me/${username}/${firstMsg.id})`,
   ]
 
+  const messageMetaPreLine = []
+
   if (firstMsg.forwarded) {
     const fwd = firstMsg.forwarded
     switch (fwd.as) {
@@ -69,15 +71,15 @@ export async function sendNote(
           ch.type === 'channel' && ch.username
             ? `https://t.me/${ch.username}/${fwd.msgId}`
             : null
-        messageMetaLine.push(
-          srcLink ? `转发自[${srcTitle}](${srcLink})` : '来自转发'
+        messageMetaPreLine.push(
+          srcLink ? `【转发自[${srcTitle}](${srcLink})】` : '【来自转发】'
         )
         break
       }
       case 'anon':
       case 'user':
       case 'anonuser': {
-        messageMetaLine.push('来自转发')
+        messageMetaPreLine.push('【来自转发】')
         break
       }
     }
@@ -86,7 +88,11 @@ export async function sendNote(
   const note: Pick<CreateNoteRequest, 'visibility' | 'text'> &
     Partial<CreateNoteRequest> = {
     visibility: 'public',
-    text: text + '\n\n' + messageMetaLine.join(' | '),
+    text:
+      (messageMetaPreLine ? messageMetaPreLine.join(' | ') + '\n\n' : '') +
+      text +
+      '\n\n' +
+      messageMetaLine.join(' | '),
   }
 
   if (finishedImages.length) {
