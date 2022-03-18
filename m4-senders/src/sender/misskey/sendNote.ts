@@ -7,6 +7,7 @@ import type MisskeyApi from './misskeyApi'
 import { Config } from '../../types'
 import got from 'got'
 import { nanoid } from 'nanoid'
+import type { Collection } from 'mongodb'
 
 import Log from '@m4/commons/src/logger'
 import { CreateNoteRequest } from './misskeyApi'
@@ -15,7 +16,8 @@ const L = Log('misskey')
 export async function sendNote(
   api: MisskeyApi,
   msges: PostMessage[],
-  glob: Config
+  glob: Config,
+  $posts: Collection<PostMessage>
 ) {
   const username = glob.channel.username
   const token = glob.channel.token
@@ -85,6 +87,16 @@ export async function sendNote(
     }
   }
 
+  const replyTo = firstMsg.replyTo
+    ? (
+        await $posts.findOne<PostMessage>({
+          id: {
+            $eq: firstMsg.replyTo,
+          },
+        })
+      )?.misskey?.id
+    : undefined
+
   const note: Pick<CreateNoteRequest, 'visibility' | 'text'> &
     Partial<CreateNoteRequest> = {
     visibility: 'public',
@@ -97,6 +109,10 @@ export async function sendNote(
 
   if (finishedImages.length) {
     note.fileIds = finishedImages
+  }
+
+  if (replyTo) {
+    note.replyId = replyTo
   }
 
   const crNote = await api.createNote(note)

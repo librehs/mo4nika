@@ -95,9 +95,9 @@ async function update(conf: MisskeyConfig, glob: Config) {
         L.d('Some messages in the message group too young, quitting')
         break
       }
-      noteLink = await sendNote(api, msgs, glob)
+      noteLink = await sendNote(api, msgs, glob, $posts)
     } else {
-      noteLink = await sendNote(api, [next], glob)
+      noteLink = await sendNote(api, [next], glob, $posts)
     }
     alreadySentMessage++
     lastMessageId = next.id
