@@ -55,6 +55,7 @@ export type PostMessageMeta = {
   replyTo?: number
   sig?: string
   isImported?: boolean
+  headers?: Record<string, string>
 } & Partial<PostMessageExternalMeta>
 
 export type PostMsgText = {

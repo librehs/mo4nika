@@ -61,18 +61,22 @@ export function parseMessage(m: Message): PostMessage {
 
   // Text-only
   if (m.text) {
-    const { md, tags } = parseTextEntities(m.text, m.entities ?? [])
+    const { md, tags, headers } = parseTextEntities(m.text, m.entities ?? [])
     return {
       ...base,
       type: 'text',
       text: md,
       tags,
+      headers,
     }
   }
 
   // Photo & Gallary
   if (m.photo) {
-    const { md, tags } = parseTextEntities(m.caption!, m.caption_entities ?? [])
+    const { md, tags, headers } = parseTextEntities(
+      m.caption!,
+      m.caption_entities ?? []
+    )
     let ret: PostMsgPhoto | PostMsgGallery = {
       ...base,
       type: 'photo',
@@ -80,7 +84,7 @@ export function parseMessage(m: Message): PostMessage {
         photo: m.photo,
         caption: md,
       },
-
+      headers,
       tags,
     }
     if (m.media_group_id) {

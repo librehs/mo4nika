@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import parseTextEntities from './textEntities'
+import parseTextEntities, { parseHeaders } from './textEntities'
 import { MessageEntity } from 'grammy/out/platform.node'
 
 const msg = {
@@ -79,5 +79,23 @@ describe('parseTextEntities', () => {
       urlTextLinkMsg.caption_entities as MessageEntity[]
     )
     expect(ret.md).to.be.deep.eq(urlTextLinkMsg.target.md)
+  })
+})
+
+describe('parseHeaders', () => {
+  it('basic test', () => {
+    expect(parseHeaders('Foo: Bar')).to.be.deep.eq({ foo: 'Bar' })
+    expect(parseHeaders('Foo: Bar\nFoo: Baz')).to.be.deep.eq({ foo: 'Baz' })
+    expect(parseHeaders('CVE-ID: CVE-2021-12345\nCVSS: 8.3')).to.be.deep.eq({
+      'cve-id': 'CVE-2021-12345',
+      cvss: '8.3',
+    })
+    expect(parseHeaders('Never Gonna: Give You Up')).to.be.deep.eq({})
+    expect(parseHeaders('Never-Gonna: Give You Up')).to.be.deep.eq({
+      'never-gonna': 'Give You Up',
+    })
+    expect(parseHeaders('G-co: [gco](https://g.co)')).to.be.deep.eq({
+      'g-co': '[gco](https://g.co)',
+    })
   })
 })

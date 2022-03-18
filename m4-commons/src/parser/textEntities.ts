@@ -1,5 +1,7 @@
 import type { MessageEntity } from 'grammy/out/platform.node'
 
+const HeaderRegEx = /^([A-Za-z-]+): (.+)/
+
 export function parseTextSegment(
   rawText: string,
   typ: string,
@@ -91,7 +93,7 @@ export function parseTextSegment(
 export default function parseTextEntities(
   text: string,
   entities: MessageEntity[]
-): { md: string; tags: string[] } {
+): { md: string; tags: string[]; headers: Record<string, string> } {
   let ret = text
   let tags: string[] = []
   for (const i of entities.sort((x, y) => y.offset - x.offset)) {
@@ -110,6 +112,7 @@ export default function parseTextEntities(
   }
   return {
     md: ret,
+    headers: parseHeaders(text),
     tags,
   }
 }
@@ -126,4 +129,14 @@ function isValidUrl(url: string): boolean {
 function toValidUrl(url: string) {
   if (isValidUrl(url)) return url
   return 'http://' + url
+}
+
+export function parseHeaders(str: string): Record<string, string> {
+  const ret: Record<string, string> = {}
+  for (const i of str.split('\n').map((x) => x.trim())) {
+    const match = i.match(HeaderRegEx)
+    if (match === null) continue
+    ret[match[1].toLowerCase()] = match[2]
+  }
+  return ret
 }
