@@ -77,7 +77,11 @@ export function parseTextSegment(
       tags.push(rawText.replace(/^#/, ''))
     }
 
-    case 'mention':
+    case 'mention': {
+      rawText = `[${rawText}](https://t.me/${rawText.replace(/^@/, '')})`
+      break
+    }
+
     case 'cashtag':
     case 'bot_command': {
       // Nothing needed
