@@ -49,7 +49,7 @@ export function parseTextSegment(
       break
     }
     case 'spoiler': {
-      // not implemented yet
+      rawText = `$[blur ${rawText}]`
       break
     }
     case 'code': {
