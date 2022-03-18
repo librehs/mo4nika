@@ -74,7 +74,7 @@ export function parseMessage(m: Message): PostMessage {
   // Photo & Gallary
   if (m.photo) {
     const { md, tags, headers } = parseTextEntities(
-      m.caption!,
+      m.caption ?? '',
       m.caption_entities ?? []
     )
     let ret: PostMsgPhoto | PostMsgGallery = {
