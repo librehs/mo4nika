@@ -96,7 +96,6 @@ export async function sendNote(
   const crNote = await api.createNote(note)
   return {
     id: crNote.createdNote.id,
-    url: crNote.createdNote.uri!,
   }
 }
 

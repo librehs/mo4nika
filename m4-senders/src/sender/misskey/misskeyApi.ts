@@ -33,8 +33,6 @@ type CreateNoteResponse = {
     fileIds?: []
     tags?: []
     channelId?: string
-    uri?: string
-    url?: string
   }
 }
 
