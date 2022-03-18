@@ -31,11 +31,11 @@ export function parseTextSegment(
 
     // Formatting
     case 'bold': {
-      rawText = '**' + rawText + '**'
+      rawText = '<b>' + rawText + '</b>'
       break
     }
     case 'italic': {
-      rawText = '*' + rawText + '*'
+      rawText = '<i>' + rawText + '</i>'
       break
     }
     case 'underline': {

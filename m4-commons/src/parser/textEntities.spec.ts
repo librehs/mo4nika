@@ -32,7 +32,7 @@ const msg = {
   ],
   target: {
     md:
-      'test **bold** *italic* underline\n' +
+      'test <b>bold</b> <i>italic</i> underline\n' +
       'test [link](https://bing.com/)\n' +
       'test `console.log`\n' +
       'test\n' +
