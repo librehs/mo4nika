@@ -75,6 +75,7 @@ export function parseTextSegment(
 
     case 'hashtag': {
       tags.push(rawText.replace(/^#/, ''))
+      break
     }
 
     case 'mention': {
