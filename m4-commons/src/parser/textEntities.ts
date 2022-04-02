@@ -1,10 +1,11 @@
 import type { MessageEntity } from 'grammy/out/platform.node'
+import type { MessageEntityType } from './types'
 
 const HeaderRegEx = /^([A-Za-z-]+): (.+)/
 
 export function parseTextSegment(
   rawText: string,
-  typ: string,
+  typ: MessageEntityType,
   uid: string | undefined,
   url: string | undefined
 ): {
@@ -97,11 +98,13 @@ export function parseTextSegment(
 
 export default function parseTextEntities(
   text: string,
-  entities: MessageEntity[]
+  entities: MessageEntity[],
+  disabledTypes: string[] = []
 ): { md: string; tags: string[]; headers: Record<string, string> } {
   let ret = text
   let tags: string[] = []
   for (const i of entities.sort((x, y) => y.offset - x.offset)) {
+    if (disabledTypes.includes(i.type)) continue
     const bef = ret.slice(0, i.offset)
     const aft = ret.slice(i.offset + i.length)
     let mid = ret.slice(i.offset, i.offset + i.length)

@@ -5,6 +5,7 @@ import type {
   User,
   Document,
   Video,
+  MessageEntity,
 } from 'grammy/out/platform.node'
 
 export type TgPhotoSize = PhotoSize
@@ -111,3 +112,9 @@ export type MediaGroup = {
   mediaGroupId: string
   items: (PostMsgGallery | PostMsgPhoto)[]
 }
+
+export type MessageEntityType =
+  | MessageEntity.CommonMessageEntity['type']
+  | MessageEntity.TextLinkMessageEntity['type']
+  | MessageEntity.TextMentionMessageEntity['type']
+  | MessageEntity.PreMessageEntity['type']

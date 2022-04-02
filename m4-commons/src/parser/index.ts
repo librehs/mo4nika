@@ -1,8 +1,27 @@
 import type { Message } from 'grammy/out/platform.node'
-import type { PostMessage, PostMsgGallery, PostMsgPhoto } from './types'
+import type {
+  MessageEntityType,
+  PostMessage,
+  PostMsgGallery,
+  PostMsgPhoto,
+} from './types'
 import parseTextEntities from './textEntities'
 
-export function parseMessage(m: Message): PostMessage {
+type ParseConfig = {
+  disabledTypes: MessageEntityType[]
+}
+
+export function parseMessage(
+  m: Message,
+  _config: Partial<ParseConfig>
+): PostMessage {
+  const config: ParseConfig = Object.assign(
+    {},
+    {
+      disabledTypes: [],
+    },
+    _config
+  )
   const base: Pick<PostMessage, 'id' | 'date' | 'tags'> & Partial<PostMessage> =
     {
       id: m.message_id,
@@ -61,7 +80,11 @@ export function parseMessage(m: Message): PostMessage {
 
   // Text-only
   if (m.text) {
-    const { md, tags, headers } = parseTextEntities(m.text, m.entities ?? [])
+    const { md, tags, headers } = parseTextEntities(
+      m.text,
+      m.entities ?? [],
+      config.disabledTypes
+    )
     return {
       ...base,
       type: 'text',
@@ -75,7 +98,8 @@ export function parseMessage(m: Message): PostMessage {
   if (m.photo) {
     const { md, tags, headers } = parseTextEntities(
       m.caption ?? '',
-      m.caption_entities ?? []
+      m.caption_entities ?? [],
+      config.disabledTypes
     )
     let ret: PostMsgPhoto | PostMsgGallery = {
       ...base,

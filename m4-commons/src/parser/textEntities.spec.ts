@@ -60,6 +60,11 @@ const urlTextLinkMsg = {
       'p2 [t.tt](http://t.tt)\n' +
       'p3 [sample](http://t.tt/)\n' +
       'p4 [sample](https://t.tt/)',
+    md_disabledTypes:
+      'p1 [https://t.co](https://t.co)\n' +
+      'p2 [t.tt](http://t.tt)\n' +
+      'p3 sample\n' +
+      'p4 sample',
   },
 }
 
@@ -79,6 +84,15 @@ describe('parseTextEntities', () => {
       urlTextLinkMsg.caption_entities as MessageEntity[]
     )
     expect(ret.md).to.be.deep.eq(urlTextLinkMsg.target.md)
+  })
+
+  it('respects disabledTypes', () => {
+    const ret = parseTextEntities(
+      urlTextLinkMsg.caption,
+      urlTextLinkMsg.caption_entities as MessageEntity[],
+      ['text_link']
+    )
+    expect(ret.md).to.be.deep.eq(urlTextLinkMsg.target.md_disabledTypes)
   })
 })
 
