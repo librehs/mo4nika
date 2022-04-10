@@ -31,8 +31,7 @@ export async function sendNote(
     return
   }
   const firstMsg = msges[0]
-  const lastMsg = msges[msges.length - 1]
-  const text = getText(lastMsg)
+  const text = getText(firstMsg)
   const containsPhoto = firstMsg.type === 'photo' || firstMsg.type === 'gallery'
   const images = containsPhoto
     ? msges.map((x) => (x as PostMsgPhoto).photo)
