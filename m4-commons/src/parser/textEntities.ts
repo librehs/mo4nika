@@ -20,7 +20,7 @@ export function parseTextSegment(
   switch (typ) {
     // Links
     case 'url': {
-      rawText = `[${rawText}](${toValidUrl(rawText)})`
+      rawText = `[${rawText}](<${toValidUrl(rawText)}>)`
       break
     }
     case 'email': {
