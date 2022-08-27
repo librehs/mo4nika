@@ -69,3 +69,5 @@ common/autoinstallers/*/.npmrc
 
 # Custom
 dist/
+
+m4-worker/wrangler.toml

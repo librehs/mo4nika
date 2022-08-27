@@ -1,0 +1,22 @@
+account_id = ""
+compatibility_date = "2022-02-01"
+kv_namespaces = []
+name = "m4-worker"
+route = ""
+type = "javascript"
+webpack_config = "webpack.config.js"
+workers_dev = true
+zone_id = ""
+
+[vars]
+BOT_TOKEN = ""
+CHANNEL_ID = "-1001234512345"
+CHAT_ID = "-1001234512345"
+WEBHOOK_PATH = "/fc40bb24059c"
+WEBHOOK_URL = "https://m4-worker.mo4nika.workers.dev/fc40bb24059c"
+
+[build]
+command = "npm run build"
+
+[build.upload]
+format = "service-worker"
