@@ -73,8 +73,8 @@ async function main() {
     process.exit(1)
   }
   config._ = {
-    channelId: Number(`-100${config.channelId}`),
-    chatId: Number(`-100${config.chatId}`),
+    channelId: Number(config.channelId),
+    chatId: Number(config.chatId),
   }
   const bot = new Bot(config.botToken)
 
