@@ -4,7 +4,6 @@
  */
 {
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
-
   /**
    * (Required) This specifies the version of the Rush engine to be used in this repo.
    * Rush's "version selector" feature ensures that the globally installed tool will
@@ -17,7 +16,6 @@
    * correct error-underlining and tab-completion for editors such as VS Code.
    */
   "rushVersion": "5.92.0",
-
   /**
    * The next field selects which package manager should be installed and determines its version.
    * Rush installs its own local copy of the package manager to ensure that your build process
@@ -27,10 +25,8 @@
    * for details about these alternatives.
    */
   "pnpmVersion": "7.27.0",
-
   // "npmVersion": "6.14.15",
   // "yarnVersion": "1.9.4",
-
   /**
    * Options that are only used when the PNPM package manager is selected
    */
@@ -47,7 +43,6 @@
   "ensureConsistentVersions": true,
   "projectFolderMinDepth": 1,
   "projectFolderMaxDepth": 1,
-
   "gitPolicy": {
     /**
      * The commit message to use when committing changes during 'rush publish'.
@@ -69,7 +64,6 @@
   "repository": {
     "url": "https://github.com/librehs/mo4nika"
   },
-
   /**
    * Event hooks are customized script actions that Rush executes when specific events occur
    */
@@ -80,23 +74,19 @@
     "preRushInstall": [
       // "common/scripts/pre-rush-install.js"
     ],
-
     /**
      * The list of shell commands to run after the Rush installation finishes
      */
     "postRushInstall": [],
-
     /**
      * The list of shell commands to run before the Rush build command starts
      */
     "preRushBuild": [],
-
     /**
      * The list of shell commands to run after the Rush build command finishes
      */
     "postRushBuild": []
   },
-
   /**
    * Installation variants allow you to maintain a parallel set of configuration files that can be
    * used to build the entire monorepo with an alternate set of dependencies.  For example, suppose
@@ -128,14 +118,12 @@
     // }
   ],
   "telemetryEnabled": false,
-
   /**
    * Allows creation of hotfix changes. This feature is experimental so it is disabled by default.
    * If this is set, 'rush change' only allows a 'hotfix' change type to be specified. This change type
    * will be used when publishing subsequent changes from the monorepo.
    */
   // "hotfixChangeEnabled": false,
-
   "projects": [
     {
       "packageName": "@m4/commons",
@@ -148,10 +136,6 @@
     {
       "packageName": "@m4/daemon",
       "projectFolder": "m4-daemon"
-    },
-    {
-      "packageName": "@m4/worker",
-      "projectFolder": "m4-worker"
     },
     {
       "packageName": "@m4/site",
