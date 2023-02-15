@@ -1,4 +1,4 @@
-import type { MessageEntity } from 'grammy/out/platform.node'
+import type { MessageEntity } from 'grammy/out/types'
 import type { MessageEntityType } from './types'
 
 const HeaderRegEx = /^([A-Za-z-]+): (.+)/
@@ -85,7 +85,8 @@ export function parseTextSegment(
     }
 
     case 'cashtag':
-    case 'bot_command': {
+    case 'bot_command':
+    case 'custom_emoji': {
       // Nothing needed
       break
     }

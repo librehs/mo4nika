@@ -6,7 +6,7 @@ import type {
   Document,
   Video,
   MessageEntity,
-} from 'grammy/out/platform.node'
+} from 'grammy/out/types'
 
 export type TgPhotoSize = PhotoSize
 
@@ -118,3 +118,4 @@ export type MessageEntityType =
   | MessageEntity.TextLinkMessageEntity['type']
   | MessageEntity.TextMentionMessageEntity['type']
   | MessageEntity.PreMessageEntity['type']
+  | MessageEntity.CustomEmojiMessageEntity['type']

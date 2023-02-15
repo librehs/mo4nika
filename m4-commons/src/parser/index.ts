@@ -1,4 +1,4 @@
-import type { Message } from 'grammy/out/platform.node'
+import type { Message } from 'grammy/out/types'
 import type {
   MessageEntityType,
   PostMessage,

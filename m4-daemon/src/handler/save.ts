@@ -7,7 +7,7 @@ import {
   POSTS_COLLECTION,
   MEDIA_GROUPS_COLLECTION,
 } from '@m4/commons/src/constants'
-import type { Message } from 'grammy/out/platform.node'
+import type { Message } from 'grammy/out/types'
 import { PostMessage, MediaGroup } from '@m4/commons/src/types'
 const L = Log('save')
 

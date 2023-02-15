@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import parseTextEntities, { parseHeaders } from './textEntities'
-import { MessageEntity } from 'grammy/out/platform.node'
+import { MessageEntity } from 'grammy/out/types'
 
 const msg = {
   caption:
