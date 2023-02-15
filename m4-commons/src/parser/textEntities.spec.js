@@ -45,20 +45,20 @@ const msg = {
     },
 };
 const urlTextLinkMsg = {
-    caption: 'p1 https://t.co\np2 t.tt\np3 sample\np4 sample',
+    caption: 'p1 https://t.co/a b/\np2 t.tt\np3 sample\np4 sample',
     caption_entities: [
-        { offset: 3, length: 12, type: 'url' },
-        { offset: 19, length: 4, type: 'url' },
-        { offset: 27, length: 7, type: 'text_link', url: 'http://t.tt/' },
-        { offset: 37, length: 6, type: 'text_link', url: 'https://t.tt/' },
+        { offset: 3, length: 17, type: 'url' },
+        { offset: 24, length: 4, type: 'url' },
+        { offset: 32, length: 7, type: 'text_link', url: 'http://t.tt/' },
+        { offset: 42, length: 6, type: 'text_link', url: 'https://t.tt/' },
     ],
     target: {
-        md: 'p1 [https://t.co](https://t.co)\n' +
-            'p2 [t.tt](http://t.tt)\n' +
+        md: 'p1 [https://t.co/a b/](<https://t.co/a b/>)\n' +
+            'p2 [t.tt](<http://t.tt>)\n' +
             'p3 [sample](http://t.tt/)\n' +
             'p4 [sample](https://t.tt/)',
-        md_disabledTypes: 'p1 [https://t.co](https://t.co)\n' +
-            'p2 [t.tt](http://t.tt)\n' +
+        md_disabledTypes: 'p1 [https://t.co/a b/](<https://t.co/a b/>)\n' +
+            'p2 [t.tt](<http://t.tt>)\n' +
             'p3 sample\n' +
             'p4 sample',
     },

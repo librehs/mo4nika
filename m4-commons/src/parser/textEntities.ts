@@ -20,7 +20,7 @@ export function parseTextSegment(
   switch (typ) {
     // Links
     case 'url': {
-      rawText = `[${rawText}](<${toValidUrl(rawText)}>)`
+      rawText = `[${rawText}](<${encodeURI(toValidUrl(rawText))}>)`
       break
     }
     case 'email': {
@@ -66,7 +66,7 @@ export function parseTextSegment(
     }
 
     case 'text_link': {
-      rawText = `[${rawText}](${url})`
+      rawText = `[${rawText}](<${encodeURI(toValidUrl(url!))}>)`
       break
     }
     case 'text_mention': {
@@ -135,7 +135,7 @@ function isValidUrl(url: string): boolean {
   }
 }
 
-function toValidUrl(url: string) {
+function toValidUrl(url: string): string {
   if (isValidUrl(url)) return url
   return 'http://' + url
 }

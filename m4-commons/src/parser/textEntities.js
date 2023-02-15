@@ -10,7 +10,7 @@ function parseTextSegment(rawText, typ, uid, url) {
     switch (typ) {
         // Links
         case 'url': {
-            rawText = `[${rawText}](<${toValidUrl(rawText)}>)`;
+            rawText = `[${rawText}](<${encodeURI(toValidUrl(rawText))}>)`;
             break;
         }
         case 'email': {
@@ -54,7 +54,7 @@ function parseTextSegment(rawText, typ, uid, url) {
             break;
         }
         case 'text_link': {
-            rawText = `[${rawText}](${url})`;
+            rawText = `[${rawText}](<${encodeURI(toValidUrl(url))}>)`;
             break;
         }
         case 'text_mention': {
