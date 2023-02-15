@@ -24,7 +24,7 @@ export default async function configureBot(bot: Bot, config: Config) {
 
   const saveMessage = async (msg: Message, newMsg: boolean) => {
     const parsedMsg = parseMessage(msg, {
-      disabledTypes: ['phone_number'],
+      disabledTypes: ['phone_number', 'custom_emoji'],
     })
     const client = new MongoClient(save.url)
     await client.connect()
