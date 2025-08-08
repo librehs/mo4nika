@@ -1,34 +1,34 @@
+import { AtpAgent } from '@atproto/api'
 import type {
+  BlueskyMessageMeta,
   PostMessage,
   PostMsgPhoto,
   TgPhotoSize,
 } from '@m4/commons/src/types'
-import type MisskeyApi from './misskeyApi'
 import { Config } from '../../types'
-import { nanoid } from 'nanoid'
 import type { Collection } from 'mongodb'
 
 import Log from '@m4/commons/src/logger'
-import { CreateNoteRequest } from './misskeyApi'
 import { getTelegramImage, getText } from '../utils'
-const L = Log('misskey')
+const L = Log('bluesky')
 
-export async function sendNote(
-  api: MisskeyApi,
+export async function sendPost(
+  agent: AtpAgent,
   msges: PostMessage[],
   glob: Config,
   $posts: Collection<PostMessage>
-) {
+): Promise<BlueskyMessageMeta | null> {
   const username = glob.channel.username
   const token = glob.channel.token
-  if (msges.length === 0) return
+
+  if (msges.length === 0) return null
   if (
     msges.filter((msg) =>
       ['unknown', 'document', 'audio', 'video'].includes(msg.type)
     ).length > 0
   ) {
     L.w(`Unrecognized message type found, skipping`)
-    return
+    return null
   }
   const firstMsg = msges[0]
   const text = getText(firstMsg)
@@ -43,7 +43,7 @@ export async function sendNote(
             x.photo,
             // for the last photo, the caption is not added to the photo but to the note
             i !== images.length - 1 ? x.caption : undefined,
-            api,
+            agent,
             token
           )
         )
@@ -93,57 +93,57 @@ export async function sendNote(
             $eq: firstMsg.replyTo,
           },
         })
-      )?.misskey?.id
+      )?.bluesky
     : undefined
 
-  const note: Pick<CreateNoteRequest, 'visibility' | 'text'> &
-    Partial<CreateNoteRequest> = {
-    visibility: 'public',
-    text:
-      (messageMetaPreLine ? messageMetaPreLine.join(' | ') + '\n\n' : '') +
-      text +
-      '\n\n' +
-      messageMetaLine.join(' | '),
+  const post: Record<string, unknown> = {
+    $type: 'app.bsky.feed.post',
+    text,
+    langs: ['zh'],
+    createdAt: new Date().toISOString(),
   }
 
   if (finishedImages.length) {
-    note.fileIds = finishedImages
+    post.embed = {
+      $type: 'app.bsky.embed.images',
+      images: finishedImages,
+    }
   }
 
   if (replyTo) {
-    note.replyId = replyTo
+    post.reply = {
+      root: replyTo,
+      parent: replyTo,
+    }
   }
 
-  const crNote = await api.createNote(note)
-  return {
-    id: crNote.createdNote.id,
+  const resp = await agent.com.atproto.repo.createRecord({
+    repo: agent.session!.did,
+    collection: 'app.bsky.feed.post',
+    record: post,
+  })
+
+  if (resp.success) {
+    const { uri, cid } = resp.data
+    return { uri, cid }
+  } else {
+    throw new Error(`Failed to send to Bsky: ${JSON.stringify(resp.data)}`)
   }
 }
 
 async function uploadAndCommentImage(
-  photo: TgPhotoSize[],
+  photos: TgPhotoSize[],
   caption: string | undefined,
-  misskeyApi: MisskeyApi,
+  agent: AtpAgent,
   token: string
-): Promise<string> {
-  const { imageBuf, filePath } = await getTelegramImage(photo, token)
-  const ext = filePath.match(/\..+$/)?.[0] ?? ''
-  const filename = nanoid(8) + ext
-  const mkFile = await misskeyApi.createFile(
-    filename,
-    imageBuf,
-    guessMimeType(ext)
-  )
-  if (caption) await misskeyApi.editFileComment(mkFile.id, caption)
-  return mkFile.id
-}
-
-function guessMimeType(ext: string): string {
-  switch (ext) {
-    case '.jpg':
-    case '.jpeg': {
-      return ''
-    }
+): Promise<unknown> {
+  const { imageBuf } = await getTelegramImage(photos, token)
+  const { data } = await agent.com.atproto.repo.uploadBlob(imageBuf)
+  return {
+    image: {
+      $type: 'blob',
+      ...data.blob,
+    },
+    alt: caption,
   }
-  return ''
 }

@@ -4,6 +4,7 @@ import { Config } from './types'
 import Log from '@m4/commons/src/logger'
 
 import misskeyUpdate from './sender/misskey'
+import blueskyUpdate from './sender/bluesky'
 
 const L = Log('daemon')
 
@@ -30,6 +31,10 @@ async function main() {
 
   if (config?.misskey?.enabled) {
     await misskeyUpdate(config.misskey, config as Config)
+  }
+
+  if (config?.bluesky?.enabled) {
+    await blueskyUpdate(config.bluesky, config as Config)
   }
 }
 
