@@ -37,3 +37,19 @@ export async function getTelegramImage(
     .buffer()
   return { imageBuf, filePath }
 }
+
+export function splitText(text: string, splitLength: number): string[] {
+  splitLength = splitLength - 14 // consider the `... [x/N]` part
+  const parts: string[] = []
+  const totalParts = Math.ceil(text.length / splitLength)
+  for (let i = 0; i < text.length; i += splitLength) {
+    const part = text.substring(i, i + splitLength)
+    const partNumber = Math.floor(i / splitLength) + 1
+    if (partNumber < totalParts) {
+      parts.push(`${part}... [${partNumber}/${totalParts}]`)
+    } else {
+      parts.push(`${part} [${totalParts}/${totalParts}]`)
+    }
+  }
+  return parts
+}

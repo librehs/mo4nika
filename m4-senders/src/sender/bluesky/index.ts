@@ -2,7 +2,7 @@ import type { BlueskyConfig, Config, DbConfig } from '../../types'
 import type {
   PostMessage,
   MediaGroup,
-  BlueskyMessageMeta,
+  BlueskyMessageThreadMeta,
 } from '@m4/commons/src/types'
 import {
   POSTS_COLLECTION,
@@ -86,7 +86,7 @@ async function update(conf: BlueskyConfig, glob: Config) {
       break
     }
 
-    let postMeta: BlueskyMessageMeta | null
+    let postMeta: BlueskyMessageThreadMeta | null
     if (next.type === 'gallery') {
       const msgGroup = await $mediaGroups.findOne({
         mediaGroupId: next.mediaGroupId,

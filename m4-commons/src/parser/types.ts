@@ -40,12 +40,16 @@ type ForwardInfo =
   | ForwardAnonUserInfo
 
 export type BlueskyMessageMeta = { uri: string; cid: string }
+export type BlueskyMessageThreadMeta = {
+  root: BlueskyMessageMeta
+  self: BlueskyMessageMeta
+}
 
 type PostMessageExternalMeta = {
   misskey?: {
     id: string
   }
-  bluesky?: BlueskyMessageMeta
+  bluesky?: BlueskyMessageThreadMeta
 }
 
 export type PostMessageMeta = {

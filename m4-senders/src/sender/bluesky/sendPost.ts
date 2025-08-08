@@ -1,6 +1,7 @@
 import { AtpAgent } from '@atproto/api'
 import type {
   BlueskyMessageMeta,
+  BlueskyMessageThreadMeta,
   PostMessage,
   PostMsgPhoto,
   TgPhotoSize,
@@ -9,33 +10,31 @@ import { Config } from '../../types'
 import type { Collection } from 'mongodb'
 
 import Log from '@m4/commons/src/logger'
-import { getTelegramImage, getText } from '../utils'
+import { getTelegramImage, getText, splitText } from '../utils'
 const L = Log('bluesky')
 
 export async function sendPost(
   agent: AtpAgent,
-  msges: PostMessage[],
+  msgs: PostMessage[],
   glob: Config,
   $posts: Collection<PostMessage>
-): Promise<BlueskyMessageMeta | null> {
+): Promise<BlueskyMessageThreadMeta | null> {
   const username = glob.channel.username
   const token = glob.channel.token
 
-  if (msges.length === 0) return null
+  if (msgs.length === 0) return null
   if (
-    msges.filter((msg) =>
+    msgs.filter((msg) =>
       ['unknown', 'document', 'audio', 'video'].includes(msg.type)
     ).length > 0
   ) {
     L.w(`Unrecognized message type found, skipping`)
     return null
   }
-  const firstMsg = msges[0]
+  const firstMsg = msgs[0]
   const text = getText(firstMsg)
   const containsPhoto = firstMsg.type === 'photo' || firstMsg.type === 'gallery'
-  const images = containsPhoto
-    ? msges.map((x) => (x as PostMsgPhoto).photo)
-    : []
+  const images = containsPhoto ? msgs.map((x) => (x as PostMsgPhoto).photo) : []
   const finishedImages = token
     ? await Promise.all(
         images.map(async (x, i) =>
@@ -96,9 +95,19 @@ export async function sendPost(
       )?.bluesky
     : undefined
 
+  const fullText =
+    (messageMetaPreLine ? messageMetaPreLine.join(' | ') + '\n\n' : '') +
+    text +
+    '\n\n' +
+    messageMetaLine.join(' | ')
+
+  // TODO: remove all Markdown markup except for links
+  // TODO: don't split between links
+  const splitFullTextParts = splitText(fullText, 300) // Bsky has a 300 cap
+
   const post: Record<string, unknown> = {
     $type: 'app.bsky.feed.post',
-    text,
+    text: splitFullTextParts[0],
     langs: ['zh'],
     createdAt: new Date().toISOString(),
   }
@@ -111,9 +120,10 @@ export async function sendPost(
   }
 
   if (replyTo) {
+    // If it's message thread, root <- parent, parent = parent
     post.reply = {
-      root: replyTo,
-      parent: replyTo,
+      root: replyTo.root,
+      parent: replyTo.self,
     }
   }
 
@@ -125,7 +135,31 @@ export async function sendPost(
 
   if (resp.success) {
     const { uri, cid } = resp.data
-    return { uri, cid }
+    const topMsg = { uri, cid }
+
+    let lastMsg: BlueskyMessageMeta = { uri, cid }
+    for (let textPart of splitFullTextParts.slice(1)) {
+      const thisMsg = await agent
+        .post({
+          text: textPart,
+          reply: {
+            root: replyTo?.root ?? topMsg,
+            parent: lastMsg,
+          },
+        })
+        .catch((x) => {
+          // Don't throw on sub-message failures
+          L.e(`Bluesky sub-message failed: ${x}`)
+        })
+      if (thisMsg) {
+        lastMsg = thisMsg
+      }
+    }
+
+    return {
+      root: replyTo?.root ?? topMsg,
+      self: topMsg,
+    }
   } else {
     throw new Error(`Failed to send to Bsky: ${JSON.stringify(resp.data)}`)
   }
