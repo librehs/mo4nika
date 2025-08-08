@@ -32,7 +32,7 @@ const msg = {
     ],
     target: {
         md: 'test <b>bold</b> <i>italic</i> underline\n' +
-            'test [link](https://bing.com/)\n' +
+            'test [link](<https://bing.com/>)\n' +
             'test `console.log`\n' +
             'test\n' +
             '```\n' +
@@ -53,11 +53,11 @@ const urlTextLinkMsg = {
         { offset: 42, length: 6, type: 'text_link', url: 'https://t.tt/' },
     ],
     target: {
-        md: 'p1 [https://t.co/a b/](<https://t.co/a b/>)\n' +
+        md: 'p1 [https://t.co/a b/](<https://t.co/a%20b/>)\n' +
             'p2 [t.tt](<http://t.tt>)\n' +
-            'p3 [sample](http://t.tt/)\n' +
-            'p4 [sample](https://t.tt/)',
-        md_disabledTypes: 'p1 [https://t.co/a b/](<https://t.co/a b/>)\n' +
+            'p3 [sample](<http://t.tt/>)\n' +
+            'p4 [sample](<https://t.tt/>)',
+        md_disabledTypes: 'p1 [https://t.co/a b/](<https://t.co/a%20b/>)\n' +
             'p2 [t.tt](<http://t.tt>)\n' +
             'p3 sample\n' +
             'p4 sample',
