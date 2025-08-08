@@ -15,6 +15,11 @@ export default async function handler(
     query: { page: _page, perpage: _perpage },
   } = req
 
+  if (_page === undefined || _perpage === undefined) {
+    res.status(400).json({ ok: false, reason: 'Invalid page/perpage' })
+    return
+  }
+
   const page = Math.max(toNumber(_page, 1), 1)
   const perpage = toNumber(_perpage, 15)
 

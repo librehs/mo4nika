@@ -15,6 +15,11 @@ export default async function handler(
     query: { page: _page, perpage: _perpage, name },
   } = req
 
+  if (_page === undefined || _perpage === undefined || name === undefined) {
+    res.status(400).json({ ok: false, reason: 'Invalid page/perpage/name' })
+    return
+  }
+
   const page = Math.max(toNumber(_page, 1), 1)
   const perpage = toNumber(_perpage, 15)
   const skip = (page - 1) * perpage
