@@ -19,6 +19,9 @@ export type MisskeyConfig = {
   enabled: boolean
   domain: string
   token: string
+
+  // Whether to bring the reply relationship on Telegram to Misskey
+  attachReply?: boolean
 } & PlatformAgnosticConfig
 
 export type BlueskyConfig = {

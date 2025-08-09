@@ -109,7 +109,7 @@ export async function sendNote(
     note.fileIds = finishedImages
   }
 
-  if (replyTo) {
+  if (glob?.misskey?.attachReply && replyTo) {
     note.replyId = replyTo
   }
 
