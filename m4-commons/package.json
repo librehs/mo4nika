@@ -4,8 +4,7 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "test": "mocha -r ts-node/register src/**/*.spec.ts"
+    "build": "tsc"
   },
   "devDependencies": {
     "typescript": "~4.9.5",

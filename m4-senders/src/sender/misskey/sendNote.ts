@@ -13,35 +13,35 @@ const L = Log('misskey')
 
 export async function sendNote(
   api: MisskeyApi,
-  msges: PostMessage[],
+  msgs: PostMessage[],
   glob: Config,
   $posts: Collection<PostMessage>
 ) {
   const username = glob.channel.username
   const token = glob.channel.token
-  if (msges.length === 0) return
+  if (msgs.length === 0) return
   if (
-    msges.filter((msg) =>
+    msgs.filter((msg) =>
       ['unknown', 'document', 'audio', 'video'].includes(msg.type)
     ).length > 0
   ) {
     L.w(`Unrecognized message type found, skipping`)
     return
   }
-  const firstMsg = msges[0].message
+  const firstMsg = msgs[0].message
   const text = getMfmText(getText(firstMsg) ?? '', firstMsg.entities ?? [], [
     'phone_number',
     'custom_emoji',
   ])
   const containsPhoto = Boolean(firstMsg.photo)
-  const images = containsPhoto ? msges.map((x) => x.message.photo!) : []
+  const images = containsPhoto ? msgs.map((x) => x.message.photo!) : []
   const finishedImages = token
     ? await Promise.all(
         images.map(async (x, i) =>
           uploadAndCommentImage(
             x,
             // for the last photo, the caption is not added to the photo but to the note
-            i !== images.length - 1 ? msges[i].message.caption : undefined,
+            i !== images.length - 1 ? msgs[i].message.caption : undefined,
             api,
             token
           )

@@ -3,14 +3,19 @@ import type {
   BlueskyMessageMeta,
   BlueskyMessageThreadMeta,
   PostMessage,
-  PostMsgPhoto,
-  TgPhotoSize,
 } from '@m4/commons/src/types'
 import { Config } from '../../types'
 import type { Collection } from 'mongodb'
+import { PhotoSize } from 'grammy/out/types.node'
 
 import Log from '@m4/commons/src/logger'
-import { getTelegramImage, getText, splitText } from '../utils'
+import {
+  getForwardSource,
+  getTelegramImage,
+  getText,
+  splitText,
+} from '../utils'
+import getBlueskyMarkup from './parser'
 const L = Log('bluesky')
 
 export async function sendPost(
@@ -31,17 +36,21 @@ export async function sendPost(
     L.w(`Unrecognized message type found, skipping`)
     return null
   }
-  const firstMsg = msgs[0]
-  const text = getText(firstMsg)
-  const containsPhoto = firstMsg.type === 'photo' || firstMsg.type === 'gallery'
-  const images = containsPhoto ? msgs.map((x) => (x as PostMsgPhoto).photo) : []
+  const firstMsg = msgs[0].message
+  const bskyMarkup = getBlueskyMarkup(
+    getText(firstMsg) ?? '',
+    firstMsg.entities ?? [],
+    ['phone_number', 'custom_emoji']
+  )
+  const containsPhoto = Boolean(firstMsg.photo)
+  const images = containsPhoto ? msgs.map((x) => x.message.photo!) : []
   const finishedImages = token
     ? await Promise.all(
         images.map(async (x, i) =>
           uploadAndCommentImage(
-            x.photo,
+            x,
             // for the last photo, the caption is not added to the photo but to the note
-            i !== images.length - 1 ? x.caption : undefined,
+            i !== images.length - 1 ? msgs[i].message.caption : undefined,
             agent,
             token
           )
@@ -55,61 +64,56 @@ export async function sendPost(
     L.d(`${finishedImages.length} images uploaded`)
   }
 
-  const messageMetaLine = [
-    `[Telegram 原文](https://t.me/${username}/${firstMsg.id})`,
-  ]
+  // TODO: parse to Bsky
+  // const messageMetaLine = [
+  //   `[Telegram 原文](https://t.me/${username}/${firstMsg.id})`,
+  // ]
 
-  const messageMetaPreLine = []
+  // const messageMetaPreLine = []
 
-  if (firstMsg.forwarded) {
-    const fwd = firstMsg.forwarded
-    switch (fwd.as) {
-      case 'channel': {
-        const ch = fwd.channel
-        const srcTitle = ch.type === 'channel' ? ch.title : '消息来源'
-        const srcLink =
-          ch.type === 'channel' && ch.username
-            ? `https://t.me/${ch.username}/${fwd.msgId}`
-            : null
-        messageMetaPreLine.push(
-          srcLink ? `【转发自[${srcTitle}](${srcLink})】` : '【来自转发】'
-        )
-        break
-      }
-      case 'anon':
-      case 'user':
-      case 'anonuser': {
-        messageMetaPreLine.push('【来自转发】')
-        break
-      }
-    }
-  }
+  // const forwardInfo = getForwardSource(firstMsg)
+  // if (forwardInfo) {
+  //   switch (forwardInfo.as) {
+  //     case 'channel': {
+  //       const ch = forwardInfo.channel
+  //       const srcTitle = ch.type === 'channel' ? ch.title : '消息来源'
+  //       const srcLink =
+  //         ch.type === 'channel' && ch.username
+  //           ? `https://t.me/${ch.username}/${forwardInfo.msgId}`
+  //           : null
+  //       messageMetaPreLine.push(
+  //         srcLink ? `【转发自[${srcTitle}](${srcLink})】` : '【来自转发】'
+  //       )
+  //       break
+  //     }
+  //     case 'anon':
+  //     case 'user':
+  //     case 'anonuser': {
+  //       messageMetaPreLine.push('【来自转发】')
+  //       break
+  //     }
+  //   }
+  // }
 
-  const replyTo = firstMsg.replyTo
+  const replyTo = firstMsg.reply_to_message
     ? (
         await $posts.findOne<PostMessage>({
           id: {
-            $eq: firstMsg.replyTo,
+            $eq: firstMsg.reply_to_message.message_id,
           },
         })
       )?.bluesky
     : undefined
 
-  const fullText =
-    (messageMetaPreLine ? messageMetaPreLine.join(' | ') + '\n\n' : '') +
-    text +
-    '\n\n' +
-    messageMetaLine.join(' | ')
-
   // TODO: remove all Markdown markup except for links
   // TODO: don't split between links
-  const splitFullTextParts = splitText(fullText, 300) // Bsky has a 300 cap
+  // const splitFullTextParts = splitText(fullText, 300) // Bsky has a 300 cap
 
   const post: Record<string, unknown> = {
     $type: 'app.bsky.feed.post',
-    text: splitFullTextParts[0],
     langs: ['zh'],
     createdAt: new Date().toISOString(),
+    ...bskyMarkup,
   }
 
   if (finishedImages.length) {
@@ -137,24 +141,24 @@ export async function sendPost(
     const { uri, cid } = resp.data
     const topMsg = { uri, cid }
 
-    let lastMsg: BlueskyMessageMeta = { uri, cid }
-    for (let textPart of splitFullTextParts.slice(1)) {
-      const thisMsg = await agent
-        .post({
-          text: textPart,
-          reply: {
-            root: replyTo?.root ?? topMsg,
-            parent: lastMsg,
-          },
-        })
-        .catch((x) => {
-          // Don't throw on sub-message failures
-          L.e(`Bluesky sub-message failed: ${x}`)
-        })
-      if (thisMsg) {
-        lastMsg = thisMsg
-      }
-    }
+    // let lastMsg: BlueskyMessageMeta = { uri, cid }
+    // for (let textPart of splitFullTextParts.slice(1)) {
+    //   const thisMsg = await agent
+    //     .post({
+    //       text: textPart,
+    //       reply: {
+    //         root: replyTo?.root ?? topMsg,
+    //         parent: lastMsg,
+    //       },
+    //     })
+    //     .catch((x) => {
+    //       // Don't throw on sub-message failures
+    //       L.e(`Bluesky sub-message failed: ${x}`)
+    //     })
+    //   if (thisMsg) {
+    //     lastMsg = thisMsg
+    //   }
+    // }
 
     return {
       root: replyTo?.root ?? topMsg,
@@ -166,13 +170,15 @@ export async function sendPost(
 }
 
 async function uploadAndCommentImage(
-  photos: TgPhotoSize[],
+  photos: PhotoSize[],
   caption: string | undefined,
   agent: AtpAgent,
   token: string
 ): Promise<unknown> {
   const { imageBuf } = await getTelegramImage(photos, token)
-  const { data } = await agent.com.atproto.repo.uploadBlob(imageBuf)
+  const { data } = await agent.com.atproto.repo.uploadBlob(
+    new Uint8Array(imageBuf)
+  )
   return {
     image: {
       $type: 'blob',
