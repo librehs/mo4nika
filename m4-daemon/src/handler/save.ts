@@ -1,14 +1,12 @@
 import { Bot } from 'grammy'
-import type { Config } from '../types'
+import type { Config, MediaGroup, RawMessage } from '../types'
 
 import Log from '@m4/commons/src/logger'
-import { parseMessage } from '@m4/commons/src/parser'
 import {
   POSTS_COLLECTION,
   MEDIA_GROUPS_COLLECTION,
 } from '@m4/commons/src/constants'
 import type { Message } from 'grammy/out/types'
-import { PostMessage, MediaGroup } from '@m4/commons/src/types'
 const L = Log('save')
 
 export default async function configureBot(bot: Bot, config: Config) {
@@ -23,21 +21,22 @@ export default async function configureBot(bot: Bot, config: Config) {
   const { MongoClient } = await import('mongodb')
 
   const saveMessage = async (msg: Message, newMsg: boolean) => {
-    const parsedMsg = parseMessage(msg, {
-      disabledTypes: ['phone_number', 'custom_emoji'],
-    })
     const client = new MongoClient(save.url)
     await client.connect()
-    const $posts = client.db().collection<PostMessage>(POSTS_COLLECTION)
+    const rawMsg: RawMessage = {
+      type: 'raw',
+      message: msg,
+    }
+    const $posts = client.db().collection<RawMessage>(POSTS_COLLECTION)
     await $posts.updateOne(
-      { id: parsedMsg.id },
+      { id: msg.message_id },
       {
-        $set: parsedMsg,
+        $set: rawMsg,
       },
       { upsert: true }
     )
-    if (parsedMsg.type === 'gallery') {
-      const mediaGroupId = parsedMsg.mediaGroupId
+    if (msg.media_group_id) {
+      const mediaGroupId = msg.media_group_id
       const $mediaGroups = client
         .db()
         .collection<MediaGroup>(MEDIA_GROUPS_COLLECTION)
@@ -46,7 +45,7 @@ export default async function configureBot(bot: Bot, config: Config) {
           { mediaGroupId },
           {
             $push: {
-              items: parsedMsg,
+              items: rawMsg,
             },
           },
           { upsert: true }
@@ -56,14 +55,14 @@ export default async function configureBot(bot: Bot, config: Config) {
           { mediaGroupId },
           {
             $set: {
-              'items.$[elem]': parsedMsg,
+              'items.$[elem]': rawMsg,
             },
           },
           {
             arrayFilters: [
               {
                 'elem.id': {
-                  $eq: parsedMsg.id,
+                  $eq: msg.message_id,
                 },
               },
             ],
