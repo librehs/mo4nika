@@ -2,7 +2,7 @@
 # e.g. docker build --build-arg MODULE=daemon
 ARG MODULE
 
-FROM node:16-bullseye AS BUILDER
+FROM node:22-bullseye AS BUILDER
 ARG MODULE
 ADD . /build
 WORKDIR /build
@@ -11,7 +11,7 @@ RUN npm install -g ncc @microsoft/rush && \
     cd m4-${MODULE} && \
     npm run build
 
-FROM node:16-bullseye AS RUNTIME
+FROM node:22-bullseye AS RUNTIME
 ARG MODULE
 COPY --from=BUILDER /build/m4-${MODULE}/dist/index.js /app/
 WORKDIR /app

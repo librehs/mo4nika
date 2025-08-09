@@ -38,7 +38,7 @@
     "useWorkspaces": true
   },
   // The code will target ES2021 (thus at least Node 15), and 15 has EOL-ed.
-  "nodeSupportedVersionRange": ">=16",
+  "nodeSupportedVersionRange": ">=22",
   "suppressNodeLtsWarning": true,
   "ensureConsistentVersions": true,
   "projectFolderMinDepth": 1,
