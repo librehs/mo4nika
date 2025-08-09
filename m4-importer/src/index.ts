@@ -6,8 +6,6 @@ import { POSTS_COLLECTION } from '@m4/commons/src/constants'
 import Log from '@m4/commons/src/logger'
 import type { PostMessage } from '@m4/commons/src/types'
 
-import parse from './parser'
-
 const L = Log('importer')
 
 program.option('-d, --database <database_uri>').option('-f, --file <dump_file>')
@@ -26,8 +24,6 @@ async function main() {
   L.i(`Channel ID: ${dump.id}`)
 
   const finalItems: PostMessage[] = dump.messages
-    .map(parse)
-    .filter((x: any) => x)
   L.i(`Converted ${finalItems.length}/${dump.messages.length} item(s).`)
 
   L.i('Connecting to MongoDB...')

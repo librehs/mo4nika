@@ -1,4 +1,4 @@
-import type { Message as TelegramMessage } from 'grammy/out/types'
+import type { Chat, User, Message as TelegramMessage } from 'grammy/out/types'
 
 interface RemoteImage {
   type: 'remote'
@@ -67,3 +67,18 @@ export type MediaGroup = {
   mediaGroupId: string
   items: RawMessage[]
 }
+
+export type BlueskyMessageMeta = { uri: string; cid: string }
+export type BlueskyMessageThreadMeta = {
+  root: BlueskyMessageMeta
+  self: BlueskyMessageMeta
+}
+
+type PostMessageExternalMeta = {
+  misskey: {
+    id: string
+  }
+  bluesky: BlueskyMessageThreadMeta
+}
+
+export type PostMessage = RawMessage & Partial<PostMessageExternalMeta>

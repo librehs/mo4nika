@@ -1,6 +1,6 @@
 import { Bot } from 'grammy'
 import type { Config } from '../types'
-import type { MediaGroup, RawMessage } from '@m4/commons/src/types'
+import type { MediaGroup, PostMessage } from '@m4/commons/src/types'
 
 import Log from '@m4/commons/src/logger'
 import {
@@ -24,11 +24,11 @@ export default async function configureBot(bot: Bot, config: Config) {
   const saveMessage = async (msg: Message, newMsg: boolean) => {
     const client = new MongoClient(save.url)
     await client.connect()
-    const rawMsg: RawMessage = {
+    const rawMsg: PostMessage = {
       type: 'raw',
       message: msg,
     }
-    const $posts = client.db().collection<RawMessage>(POSTS_COLLECTION)
+    const $posts = client.db().collection<PostMessage>(POSTS_COLLECTION)
     await $posts.updateOne(
       { id: msg.message_id },
       {

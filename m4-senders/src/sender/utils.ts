@@ -1,21 +1,20 @@
-import type { PostMessage, TgPhotoSize } from '@m4/commons/src/types'
+import type {
+  Message as TgMessage,
+  PhotoSize as TgPhotoSize,
+} from 'grammy/out/types'
 import got from 'got'
+import { ForwardInfo } from './types'
 
-export function getText(msg: PostMessage): string {
-  switch (msg.type) {
-    case 'text': {
-      return msg.text
-    }
-    case 'photo': {
-      return msg.photo.caption!
-    }
-    case 'gallery': {
-      return msg.photo.caption!
-    }
-    default: {
-      throw Error('unreachable')
-    }
+function isPhotoOrGallery(msg: TgMessage): boolean {
+  return Boolean(msg.media_group_id || msg.photo)
+}
+
+export function getText(msg: TgMessage): string | undefined {
+  if (isPhotoOrGallery(msg)) {
+    return msg.caption
   }
+
+  return msg.text
 }
 
 export async function getTelegramImage(
@@ -52,4 +51,40 @@ export function splitText(text: string, splitLength: number): string[] {
     }
   }
   return parts
+}
+
+export function getForwardSource(m: TgMessage): ForwardInfo | null {
+  if (m.forward_from_message_id) {
+    // 1. From a channel
+    return {
+      as: 'channel',
+      msgId: m.forward_from_message_id,
+      channel: m.forward_from_chat!,
+      sig: m.forward_signature,
+    }
+  }
+  if (m.forward_from_chat && !m.forward_from_message_id) {
+    // 2. From an anon (as a chanenl)
+    return {
+      as: 'anon',
+      channel: m.forward_from_chat,
+      sig: m.forward_signature,
+    }
+  }
+  if (m.forward_from) {
+    // 3. From a linked user
+    return {
+      as: 'user',
+      user: m.forward_from,
+    }
+  }
+  if (m.forward_sender_name) {
+    // 4. From an unlinked user
+    return {
+      as: 'anonuser',
+      name: m.forward_sender_name,
+    }
+  }
+
+  return null
 }

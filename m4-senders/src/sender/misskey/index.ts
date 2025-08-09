@@ -71,25 +71,30 @@ async function update(conf: MisskeyConfig, glob: Config) {
       L.d('No next message, quitting')
       break
     }
-    L.d(`Processing message #${next.id}`)
-    if (Number(now) - Number(next.date) <= sendAfterSeconds * 1000) {
+    L.d(`Processing message #${next.message.message_id}`)
+    if (
+      Number(now) - Number(next.message.date * 1000) <=
+      sendAfterSeconds * 1000
+    ) {
       L.d('Message too young, quitting')
       break
     }
 
     let noteLink
-    if (next.type === 'gallery') {
+    if (next.message.media_group_id) {
       const msgGroup = await $mediaGroups.findOne({
-        mediaGroupId: next.mediaGroupId,
+        mediaGroupId: next.message.media_group_id,
       })
       if (!msgGroup) {
-        L.e(`Message group #${next.mediaGroupId} not found, skipping`)
+        L.e(`Message group #${next.message.media_group_id} not found, skipping`)
         continue
       }
       const msgs = msgGroup.items
       if (
         msgs.filter(
-          (x) => Number(now) - Number(x.date) <= sendAfterSeconds * 1000
+          (x) =>
+            Number(now) - Number(x.message.date * 1000) <=
+            sendAfterSeconds * 1000
         ).length > 0
       ) {
         L.d('Some messages in the message group too young, quitting')
@@ -100,13 +105,13 @@ async function update(conf: MisskeyConfig, glob: Config) {
       noteLink = await sendNote(api, [next], glob, $posts)
     }
     alreadySentMessage++
-    lastMessageId = next.id
+    lastMessageId = next.message.message_id
 
-    L.d(`Sent message #${next.id}`)
+    L.d(`Sent message #${next.message.message_id}`)
 
     if (noteLink) {
       await $posts.updateOne(
-        { id: next.id },
+        { id: next.message.message_id },
         {
           $set: {
             misskey: noteLink,

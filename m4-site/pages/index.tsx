@@ -1,14 +1,10 @@
 import Global from '../config'
-import { query as getAllTags } from './api/tags'
-import { query as getPosts } from './api/list'
+import TelegramIframe from '../components/TelegramIframe'
 import type { InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import MarkdownIt from 'markdown-it'
 import type { PostMessage } from '@m4/commons/src/types'
-import Tag from '../components/Tag'
-import TelegramIframe from '../components/TelegramIframe'
-import Link from 'next/link'
 
 const md = new MarkdownIt({
   breaks: true,
@@ -52,7 +48,11 @@ const Home = ({
           {items.map((item, key) => (
             <tr key={key} className="msgTable">
               <td className="text-blue-600">
-                <a href={`https://t.me/${Global.name}/${item.id}`}>{item.id}</a>
+                <a
+                  href={`https://t.me/${Global.name}/${item.message.message_id}`}
+                >
+                  {item.message.message_id}
+                </a>
                 {Global.misskeyDomain && item.misskey && (
                   <>
                     <br />
@@ -68,14 +68,17 @@ const Home = ({
               </td>
               <td>
                 <div className="overflow-y-scroll iframeBody">
-                  <TelegramIframe username={Global.name} id={item.id} />
+                  <TelegramIframe
+                    username={Global.name}
+                    id={item.message.message_id}
+                  />
                 </div>
               </td>
-              <td>
+              {/* <td>
                 {item.tags.map((x, key) => (
                   <Tag key={key} name={x} />
                 ))}
-              </td>
+              </td> */}
             </tr>
           ))}
         </tbody>
@@ -93,7 +96,9 @@ const Home = ({
         <div className="bg-sky-500 m-1 p-2 rounded-xl text-white">
           Page {pageNumber}
           {items.length
-            ? ` (#${items[items.length - 1].id} - #${items[0].id})`
+            ? ` (#${items[items.length - 1].message.message_id} - #${
+                items[0].message.message_id
+              })`
             : ''}
         </div>
         <button

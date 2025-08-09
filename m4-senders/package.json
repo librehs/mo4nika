@@ -12,11 +12,16 @@
     "got": "~12.5.3",
     "nanoid": "~4.0.1",
     "form-data": "~4.0.0",
+    "grammy": "~1.14.1",
     "@atproto/api": "~0.16.2"
   },
   "devDependencies": {
     "tslib": "~2.5.0",
     "@types/node": "~18.13.0",
-    "@vercel/ncc": "~0.36.1"
+    "@vercel/ncc": "~0.36.1",
+    "chai": "~4.3.7",
+    "mocha": "~10.2.0",
+    "@types/mocha": "~10.0.1",
+    "@types/chai": "~4.3.4"
   }
 }

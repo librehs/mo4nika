@@ -1,8 +1,3 @@
-import type {
-  PostMessage,
-  PostMsgPhoto,
-  TgPhotoSize,
-} from '@m4/commons/src/types'
 import type MisskeyApi from './misskeyApi'
 import { Config } from '../../types'
 import { nanoid } from 'nanoid'
@@ -10,7 +5,10 @@ import type { Collection } from 'mongodb'
 
 import Log from '@m4/commons/src/logger'
 import { CreateNoteRequest } from './misskeyApi'
-import { getTelegramImage, getText } from '../utils'
+import { getForwardSource, getTelegramImage, getText } from '../utils'
+import { PostMessage } from '@m4/commons/src/types'
+import { PhotoSize } from 'grammy/out/types.node'
+import { getMfmText } from './parser'
 const L = Log('misskey')
 
 export async function sendNote(
@@ -30,19 +28,20 @@ export async function sendNote(
     L.w(`Unrecognized message type found, skipping`)
     return
   }
-  const firstMsg = msges[0]
-  const text = getText(firstMsg)
-  const containsPhoto = firstMsg.type === 'photo' || firstMsg.type === 'gallery'
-  const images = containsPhoto
-    ? msges.map((x) => (x as PostMsgPhoto).photo)
-    : []
+  const firstMsg = msges[0].message
+  const text = getMfmText(getText(firstMsg) ?? '', firstMsg.entities ?? [], [
+    'phone_number',
+    'custom_emoji',
+  ])
+  const containsPhoto = Boolean(firstMsg.photo)
+  const images = containsPhoto ? msges.map((x) => x.message.photo!) : []
   const finishedImages = token
     ? await Promise.all(
         images.map(async (x, i) =>
           uploadAndCommentImage(
-            x.photo,
+            x,
             // for the last photo, the caption is not added to the photo but to the note
-            i !== images.length - 1 ? x.caption : undefined,
+            i !== images.length - 1 ? msges[i].message.caption : undefined,
             api,
             token
           )
@@ -57,20 +56,20 @@ export async function sendNote(
   }
 
   const messageMetaLine = [
-    `[Telegram 原文](https://t.me/${username}/${firstMsg.id})`,
+    `[Telegram 原文](https://t.me/${username}/${firstMsg.message_id})`,
   ]
 
   const messageMetaPreLine = []
 
-  if (firstMsg.forwarded) {
-    const fwd = firstMsg.forwarded
-    switch (fwd.as) {
+  const forwardInfo = getForwardSource(firstMsg)
+  if (forwardInfo) {
+    switch (forwardInfo.as) {
       case 'channel': {
-        const ch = fwd.channel
+        const ch = forwardInfo.channel
         const srcTitle = ch.type === 'channel' ? ch.title : '消息来源'
         const srcLink =
           ch.type === 'channel' && ch.username
-            ? `https://t.me/${ch.username}/${fwd.msgId}`
+            ? `https://t.me/${ch.username}/${forwardInfo.msgId}`
             : null
         messageMetaPreLine.push(
           srcLink ? `【转发自[${srcTitle}](${srcLink})】` : '【来自转发】'
@@ -86,11 +85,11 @@ export async function sendNote(
     }
   }
 
-  const replyTo = firstMsg.replyTo
+  const replyTo = firstMsg.reply_to_message
     ? (
         await $posts.findOne<PostMessage>({
           id: {
-            $eq: firstMsg.replyTo,
+            $eq: firstMsg.reply_to_message.message_id,
           },
         })
       )?.misskey?.id
@@ -121,7 +120,7 @@ export async function sendNote(
 }
 
 async function uploadAndCommentImage(
-  photo: TgPhotoSize[],
+  photo: PhotoSize[],
   caption: string | undefined,
   misskeyApi: MisskeyApi,
   token: string
