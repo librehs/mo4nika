@@ -1,5 +1,6 @@
 import { Bot } from 'grammy'
-import type { Config, MediaGroup, RawMessage } from '../types'
+import type { Config } from '../types'
+import type { MediaGroup, RawMessage } from '@m4/commons/src/types'
 
 import Log from '@m4/commons/src/logger'
 import {

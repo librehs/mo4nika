@@ -1,3 +1,5 @@
+import type { Message as TelegramMessage } from 'grammy/out/types'
+
 interface RemoteImage {
   type: 'remote'
   url: string
@@ -46,4 +48,22 @@ export interface Sender {
   sendMessage: (m: Message) => Promise<Result>
 }
 
-export * from './parser/types'
+/**
+ * We switched to save the original schema of Telegram message to easily create Bluesky message.
+ *
+ * In the past we save the parsed MFM (Misskey Formatted Markdown) format.
+ */
+export interface RawMessage {
+  type: 'raw'
+  message: TelegramMessage
+}
+
+/**
+ * We switched to save the original schema of Telegram message to easily create Bluesky message.
+ *
+ * In the past we save the parsed MFM (Misskey Formatted Markdown) format.
+ */
+export type MediaGroup = {
+  mediaGroupId: string
+  items: RawMessage[]
+}
