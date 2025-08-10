@@ -56,6 +56,8 @@ export interface Sender {
 export interface RawMessage {
   type: 'raw'
   message: TelegramMessage
+  tags: string[]
+  date: Date
 }
 
 /**

@@ -8,6 +8,7 @@ import {
   MEDIA_GROUPS_COLLECTION,
 } from '@m4/commons/src/constants'
 import type { Message } from 'grammy/out/types'
+import { getHashtags } from '../utils'
 const L = Log('save')
 
 export default async function configureBot(bot: Bot, config: Config) {
@@ -27,6 +28,8 @@ export default async function configureBot(bot: Bot, config: Config) {
     const rawMsg: PostMessage = {
       type: 'raw',
       message: msg,
+      date: new Date(msg.date * 1000),
+      tags: msg.text && msg.entities ? getHashtags(msg.text, msg.entities) : [],
     }
     const $posts = client.db().collection<PostMessage>(POSTS_COLLECTION)
     await $posts.updateOne(
