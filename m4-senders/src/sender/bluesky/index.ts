@@ -80,6 +80,10 @@ async function update(conf: BlueskyConfig, glob: Config) {
       L.d('No next message, quitting')
       break
     }
+    if (next.type !== 'raw') {
+      L.w(`Message collected by older version of daemon, skipping`)
+      break
+    }
     L.d(`Processing message #${next.message.message_id}`)
     if (
       Number(now) - Number(next.message.date * 1000) <=
