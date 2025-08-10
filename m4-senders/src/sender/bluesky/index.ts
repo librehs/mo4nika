@@ -82,6 +82,7 @@ async function update(conf: BlueskyConfig, glob: Config) {
     }
     if (next.type !== 'raw') {
       L.w(`Message collected by older version of daemon, skipping`)
+      lastMessageId = next.message.message_id
       break
     }
     L.d(`Processing message #${next.message.message_id}`)
