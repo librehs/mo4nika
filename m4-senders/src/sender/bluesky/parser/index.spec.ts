@@ -4,6 +4,10 @@ import getBlueskyMarkup, {
   getMappingToUtf8ByteOffset,
 } from './index'
 import type { MessageEntity } from 'grammy/out/types'
+import { RichText } from '@atproto/api'
+import type { BskyRichtextMessage } from './types'
+
+const parse = (msg: BskyRichtextMessage) => [...new RichText(msg).segments()]
 
 describe('getBlueskyMarkup', () => {
   const message = {
@@ -31,84 +35,112 @@ describe('getBlueskyMarkup', () => {
     },
   }
 
+  const result = [
+    {
+      facet: undefined,
+      text: 'Kubesphere 宣布停止开源版下载，只提供商业版支持。有用户称其也删除了部分组件导致开源版无法正常使用。\n\n- Kubesphere 是青云 (QingCloud) 开发的 Kubernetes 平台。\n\n',
+    },
+    {
+      text: 'gh:kubesphere/kubesphere#6550',
+      facet: {
+        index: {
+          byteStart: 212,
+          byteEnd: 241,
+        },
+        features: [
+          {
+            $type: 'app.bsky.richtext.facet#link',
+            uri: 'https://github.com/kubesphere/kubesphere/issues/6550',
+          },
+        ],
+      },
+    },
+    { facet: undefined, text: '\n\n1. ' },
+    {
+      text: 'gh:kubesphere/website#3281',
+      facet: {
+        index: {
+          byteStart: 246,
+          byteEnd: 272,
+        },
+        features: [
+          {
+            $type: 'app.bsky.richtext.facet#link',
+            uri: 'https://github.com/kubesphere/website/pull/3281',
+          },
+        ],
+      },
+    },
+    { facet: undefined, text: '\n\nlinksrc: ' },
+    {
+      text: 't.me/billchenla/2090',
+      facet: {
+        index: {
+          byteStart: 283,
+          byteEnd: 303,
+        },
+        features: [
+          {
+            $type: 'app.bsky.richtext.facet#link',
+            uri: 't.me/billchenla/2090',
+          },
+        ],
+      },
+    },
+    { facet: undefined, text: '\n\n' },
+    {
+      text: '#Kubesphere',
+      facet: {
+        index: {
+          byteStart: 305,
+          byteEnd: 316,
+        },
+        features: [
+          {
+            $type: 'app.bsky.richtext.facet#tag',
+            tag: 'Kubesphere',
+          },
+        ],
+      },
+    },
+    { facet: undefined, text: ' ' },
+    {
+      text: '#QingCloud',
+      facet: {
+        index: {
+          byteStart: 317,
+          byteEnd: 327,
+        },
+        features: [
+          {
+            $type: 'app.bsky.richtext.facet#tag',
+            tag: 'QingCloud',
+          },
+        ],
+      },
+    },
+    { facet: undefined, text: ' ' },
+    {
+      text: '#Opensource',
+      facet: {
+        index: {
+          byteStart: 328,
+          byteEnd: 339,
+        },
+        features: [
+          {
+            $type: 'app.bsky.richtext.facet#tag',
+            tag: 'Opensource',
+          },
+        ],
+      },
+    },
+  ]
+
   it('should parse the item', () => {
-    expect(getBlueskyMarkup(message.text, message.entities, [])).to.deep.eq({
-      text: message.text,
-      facets: [
-        {
-          features: [
-            {
-              $type: 'app.bsky.richtext.facet#link',
-              uri: 'https://github.com/kubesphere/kubesphere/issues/6550',
-            },
-          ],
-          index: {
-            byteEnd: 241,
-            byteStart: 212,
-          },
-        },
-        {
-          features: [
-            {
-              $type: 'app.bsky.richtext.facet#link',
-              uri: 'https://github.com/kubesphere/website/pull/3281',
-            },
-          ],
-          index: {
-            byteEnd: 272,
-            byteStart: 246,
-          },
-        },
-        {
-          features: [
-            {
-              $type: 'app.bsky.richtext.facet#link',
-              uri: 't.me/billchenla/2090',
-            },
-          ],
-          index: {
-            byteEnd: 303,
-            byteStart: 283,
-          },
-        },
-        {
-          features: [
-            {
-              $type: 'app.bsky.richtext.facet#tag',
-              tag: 'Kubesphere',
-            },
-          ],
-          index: {
-            byteEnd: 316,
-            byteStart: 305,
-          },
-        },
-        {
-          features: [
-            {
-              $type: 'app.bsky.richtext.facet#tag',
-              tag: 'QingCloud',
-            },
-          ],
-          index: {
-            byteEnd: 327,
-            byteStart: 317,
-          },
-        },
-        {
-          features: [
-            {
-              $type: 'app.bsky.richtext.facet#tag',
-              tag: 'Opensource',
-            },
-          ],
-          index: {
-            byteEnd: 339,
-            byteStart: 328,
-          },
-        },
-      ],
-    })
+    expect(
+      parse(getBlueskyMarkup(message.text, message.entities, []))
+    ).to.deep.eq(result)
   })
 })
 
