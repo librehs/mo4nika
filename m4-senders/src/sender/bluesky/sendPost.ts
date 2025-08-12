@@ -7,16 +7,18 @@ import type {
 import { Config } from '../../types'
 import type { Collection } from 'mongodb'
 import { PhotoSize } from 'grammy/out/types.node'
-
 import Log from '@m4/commons/src/logger'
-import {
-  getForwardSource,
-  getTelegramImage,
-  getText,
-  splitText,
-} from '../utils'
-import getBlueskyMarkup from './parser'
+import { getForwardSource, getTelegramImage, getText } from '../utils'
+import getRichText, {
+  createLinkRichText,
+  createTextRichText,
+  mergeRichTexts,
+  splitRichText,
+} from './parser'
+import { BskyRichtextMessage } from './parser/types'
+
 const L = Log('bluesky')
+const MAX_MESSAGE_LENGTH = 299
 
 export async function sendPost(
   agent: AtpAgent,
@@ -37,7 +39,7 @@ export async function sendPost(
     return null
   }
   const firstMsg = msgs[0].message
-  const bskyMarkup = getBlueskyMarkup(
+  const baseRichText = getRichText(
     getText(firstMsg) ?? '',
     firstMsg.entities ?? [],
     ['phone_number', 'custom_emoji']
@@ -64,36 +66,50 @@ export async function sendPost(
     L.d(`${finishedImages.length} images uploaded`)
   }
 
-  // TODO: parse to Bsky
-  // const messageMetaLine = [
-  //   `[Telegram 原文](https://t.me/${username}/${firstMsg.id})`,
-  // ]
+  const preMsgRichtexts: BskyRichtextMessage[] = []
+  const forwardInfo = getForwardSource(firstMsg)
+  if (forwardInfo) {
+    switch (forwardInfo.as) {
+      case 'channel': {
+        const ch = forwardInfo.channel
+        const srcTitle = ch.type === 'channel' ? ch.title : '消息来源'
+        const srcLink =
+          ch.type === 'channel' && ch.username
+            ? `https://t.me/${ch.username}/${forwardInfo.msgId}`
+            : null
+        preMsgRichtexts.push(
+          srcLink
+            ? mergeRichTexts([
+                createTextRichText('【转发自'),
+                createLinkRichText(srcTitle, srcLink),
+                createTextRichText('】'),
+              ])
+            : createTextRichText('【来自转发】')
+        )
+        break
+      }
+      case 'anon':
+      case 'user':
+      case 'anonuser': {
+        preMsgRichtexts.push(createTextRichText('【来自转发】'))
+        break
+      }
+    }
+  }
 
-  // const messageMetaPreLine = []
+  const postMsgRichtexts = [
+    createLinkRichText(
+      'Telegram 原文',
+      `https://t.me/${username}/${firstMsg.message_id}`
+    ),
+  ]
 
-  // const forwardInfo = getForwardSource(firstMsg)
-  // if (forwardInfo) {
-  //   switch (forwardInfo.as) {
-  //     case 'channel': {
-  //       const ch = forwardInfo.channel
-  //       const srcTitle = ch.type === 'channel' ? ch.title : '消息来源'
-  //       const srcLink =
-  //         ch.type === 'channel' && ch.username
-  //           ? `https://t.me/${ch.username}/${forwardInfo.msgId}`
-  //           : null
-  //       messageMetaPreLine.push(
-  //         srcLink ? `【转发自[${srcTitle}](${srcLink})】` : '【来自转发】'
-  //       )
-  //       break
-  //     }
-  //     case 'anon':
-  //     case 'user':
-  //     case 'anonuser': {
-  //       messageMetaPreLine.push('【来自转发】')
-  //       break
-  //     }
-  //   }
-  // }
+  const finalRichText = mergeRichTexts([
+    ...preMsgRichtexts,
+    baseRichText,
+    ...postMsgRichtexts,
+  ])
+  const splitBskyMsgs = splitRichText(finalRichText, MAX_MESSAGE_LENGTH)
 
   const replyTo = firstMsg.reply_to_message
     ? (
@@ -105,15 +121,11 @@ export async function sendPost(
       )?.bluesky
     : undefined
 
-  // TODO: remove all Markdown markup except for links
-  // TODO: don't split between links
-  // const splitFullTextParts = splitText(fullText, 300) // Bsky has a 300 cap
-
   const post: Record<string, unknown> = {
     $type: 'app.bsky.feed.post',
     langs: ['zh'],
     createdAt: new Date().toISOString(),
-    ...bskyMarkup,
+    ...splitBskyMsgs[0],
   }
 
   if (finishedImages.length) {
@@ -141,24 +153,26 @@ export async function sendPost(
     const { uri, cid } = resp.data
     const topMsg = { uri, cid }
 
-    // let lastMsg: BlueskyMessageMeta = { uri, cid }
-    // for (let textPart of splitFullTextParts.slice(1)) {
-    //   const thisMsg = await agent
-    //     .post({
-    //       text: textPart,
-    //       reply: {
-    //         root: replyTo?.root ?? topMsg,
-    //         parent: lastMsg,
-    //       },
-    //     })
-    //     .catch((x) => {
-    //       // Don't throw on sub-message failures
-    //       L.e(`Bluesky sub-message failed: ${x}`)
-    //     })
-    //   if (thisMsg) {
-    //     lastMsg = thisMsg
-    //   }
-    // }
+    let lastMsg: BlueskyMessageMeta = { uri, cid }
+    const otherMsgs = splitBskyMsgs.slice(1)
+    for (const part of otherMsgs) {
+      const thisMsg = await agent
+        .post({
+          ...part,
+          langs: ['zh'],
+          reply: {
+            root: replyTo?.root ?? topMsg,
+            parent: lastMsg,
+          },
+        })
+        .catch((x) => {
+          // Don't throw on sub-message failures
+          L.e(`Bluesky sub-message failed: ${x}`)
+        })
+      if (thisMsg) {
+        lastMsg = thisMsg
+      }
+    }
 
     return {
       root: replyTo?.root ?? topMsg,
