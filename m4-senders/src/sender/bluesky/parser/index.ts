@@ -241,3 +241,5 @@ export default function getRichText(
     facets,
   }
 }
+
+export const LF = () => createTextRichText('\n')

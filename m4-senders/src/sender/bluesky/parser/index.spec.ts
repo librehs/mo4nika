@@ -8,11 +8,8 @@ import getRichText, {
   createTextRichText,
   createLinkRichText,
 } from './index'
+import { parse } from './utils'
 import type { MessageEntity } from 'grammy/out/types'
-import { RichText } from '@atproto/api'
-import type { BskyRichtextMessage } from './types'
-
-const parse = (msg: BskyRichtextMessage) => [...new RichText(msg).segments()]
 
 describe('getBlueskyMarkup', () => {
   const message = {

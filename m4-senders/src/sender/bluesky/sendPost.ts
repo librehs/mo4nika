@@ -12,6 +12,7 @@ import { getForwardSource, getTelegramImage, getText } from '../utils'
 import getRichText, {
   createLinkRichText,
   createTextRichText,
+  LF,
   mergeRichTexts,
   splitRichText,
 } from './parser'
@@ -105,9 +106,17 @@ export async function sendPost(
   ]
 
   const finalRichText = mergeRichTexts([
-    ...preMsgRichtexts,
+    // every line of pre-content text is joined with an empty line
+    ...preMsgRichtexts.map((x) => [x, LF()]).reduce((a, b) => [...a, ...b], []),
+    // pre-content texts need an empty line
+    ...(preMsgRichtexts.length > 0 ? [LF()] : []),
     baseRichText,
-    ...postMsgRichtexts,
+    // post-content texts need an empty line
+    ...(postMsgRichtexts.length > 0 ? [LF()] : []),
+    // every line of post-content text is joined with an empty line
+    ...postMsgRichtexts
+      .map((x) => [LF(), x])
+      .reduce((a, b) => [...a, ...b], []),
   ])
   const splitBskyMsgs = splitRichText(finalRichText, MAX_MESSAGE_LENGTH)
 
