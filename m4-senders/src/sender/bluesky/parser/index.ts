@@ -21,6 +21,15 @@ function getTotalByteSizes(texts: string[]): number[] {
   return ret
 }
 
+export function toUrl(url: string): string {
+  try {
+    new URL(url)
+    return url
+  } catch (_) {
+    return 'https://' + url
+  }
+}
+
 export function getMappingToUtf8ByteOffset(text: string): number[] {
   // https://docs.bsky.app/docs/advanced-guides/post-richtext#text-encoding-and-indexing
   const mapping: number[] = []
@@ -90,7 +99,7 @@ export function entityToFacet(
         features: [
           {
             $type: 'app.bsky.richtext.facet#link',
-            uri: partText,
+            uri: toUrl(partText),
           },
         ],
       }

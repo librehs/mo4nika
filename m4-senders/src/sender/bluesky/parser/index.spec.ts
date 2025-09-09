@@ -7,6 +7,7 @@ import getRichText, {
   mergeRichTexts,
   createTextRichText,
   createLinkRichText,
+  toUrl,
 } from './index'
 import { parse } from './utils'
 import type { MessageEntity } from 'grammy/out/types'
@@ -84,7 +85,7 @@ describe('getBlueskyMarkup', () => {
         features: [
           {
             $type: 'app.bsky.richtext.facet#link',
-            uri: 't.me/billchenla/2090',
+            uri: 'https://t.me/billchenla/2090',
           },
         ],
       },
@@ -264,7 +265,9 @@ describe('entityToFacet', () => {
     const mapping = getMappingToUtf8ByteOffset(text)
     expect(entityToFacet(text, entity, mapping)).to.deep.eq({
       index: { byteStart: 0, byteEnd: 5 },
-      features: [{ $type: 'app.bsky.richtext.facet#link', uri: 'hello' }],
+      features: [
+        { $type: 'app.bsky.richtext.facet#link', uri: 'https://hello' },
+      ],
     })
   })
 
@@ -393,5 +396,11 @@ describe('createLinkRichText', () => {
         },
       ],
     })
+  })
+})
+
+describe('toUrl', () => {
+  it('should recognize non-protocol URL', () => {
+    expect(toUrl('example.com')).to.eq('https://example.com')
   })
 })
