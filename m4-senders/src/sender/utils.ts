@@ -42,9 +42,10 @@ export function splitText(text: string, splitLength: number): string[] {
   let currentPart = ''
   const lines = text.split('\n')
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
     if (currentPart.length + line.length + 1 <= splitLength) {
-      currentPart += (currentPart.length > 0 ? '\n' : '') + line
+      currentPart += (i > 0 ? '\n' : '') + line
     } else {
       if (currentPart.length > 0) {
         parts.push(currentPart)
