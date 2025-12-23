@@ -49,15 +49,7 @@ export async function sendPost(
   const images = containsPhoto ? msgs.map((x) => x.message.photo!) : []
   const finishedImages = token
     ? await Promise.all(
-        images.map(async (x, i) =>
-          uploadAndCommentImage(
-            x,
-            // for the last photo, the caption is not added to the photo but to the note
-            i !== images.length - 1 ? msgs[i].message.caption : undefined,
-            agent,
-            token
-          )
-        )
+        images.map(async (x, i) => uploadAndCommentImage(x, agent, token)),
       )
     : []
   if (images.length > 0 && !token) {
@@ -140,7 +132,10 @@ export async function sendPost(
   if (finishedImages.length) {
     post.embed = {
       $type: 'app.bsky.embed.images',
-      images: finishedImages,
+      images: finishedImages.map((img) => ({
+        alt: '',
+        image: img,
+      })),
     }
   }
 
@@ -194,19 +189,12 @@ export async function sendPost(
 
 async function uploadAndCommentImage(
   photos: PhotoSize[],
-  caption: string | undefined,
   agent: AtpAgent,
-  token: string
-): Promise<unknown> {
+  token: string,
+): Promise<BlobRef> {
   const { imageBuf } = await getTelegramImage(photos, token)
   const { data } = await agent.com.atproto.repo.uploadBlob(
-    new Uint8Array(imageBuf)
+    new Uint8Array(imageBuf),
   )
-  return {
-    image: {
-      $type: 'blob',
-      ...data.blob,
-    },
-    alt: caption,
-  }
+  return data.blob
 }
