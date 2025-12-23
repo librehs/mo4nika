@@ -1,4 +1,5 @@
 import { AtpAgent } from '@atproto/api'
+import type { BlobRef } from '@atproto/api'
 import type {
   BlueskyMessageMeta,
   BlueskyMessageThreadMeta,
@@ -25,7 +26,7 @@ export async function sendPost(
   agent: AtpAgent,
   msgs: PostMessage[],
   glob: Config,
-  $posts: Collection<PostMessage>
+  $posts: Collection<PostMessage>,
 ): Promise<BlueskyMessageThreadMeta | null> {
   const username = glob.channel.username
   const token = glob.channel.token
@@ -33,7 +34,7 @@ export async function sendPost(
   if (msgs.length === 0) return null
   if (
     msgs.filter((msg) =>
-      ['unknown', 'document', 'audio', 'video'].includes(msg.type)
+      ['unknown', 'document', 'audio', 'video'].includes(msg.type),
     ).length > 0
   ) {
     L.w(`Unrecognized message type found, skipping`)
@@ -43,7 +44,7 @@ export async function sendPost(
   const baseRichText = getRichText(
     getText(firstMsg) ?? '',
     firstMsg.entities ?? [],
-    ['phone_number', 'custom_emoji']
+    ['phone_number', 'custom_emoji'],
   )
   const containsPhoto = Boolean(firstMsg.photo)
   const images = containsPhoto ? msgs.map((x) => x.message.photo!) : []
@@ -77,7 +78,7 @@ export async function sendPost(
                 createLinkRichText(srcTitle, srcLink),
                 createTextRichText('】'),
               ])
-            : createTextRichText('【来自转发】')
+            : createTextRichText('【来自转发】'),
         )
         break
       }
@@ -93,7 +94,7 @@ export async function sendPost(
   const postMsgRichtexts = [
     createLinkRichText(
       'Telegram 原文',
-      `https://t.me/${username}/${firstMsg.message_id}`
+      `https://t.me/${username}/${firstMsg.message_id}`,
     ),
   ]
 
