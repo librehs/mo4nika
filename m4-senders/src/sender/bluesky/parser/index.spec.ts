@@ -303,11 +303,11 @@ describe('splitRichText', () => {
         },
       ],
     }
-    const result = splitRichText(m, 20)
+    const result = splitRichText(m, 10)
     expect(result.length).to.eq(3)
-    expect(result[0].text).to.eq('hello  ... [1/3]')
+    expect(result[0].text).to.eq('hello  ...')
     expect(result[0].facets).to.deep.eq([])
-    expect(result[1].text).to.eq('world ... [2/3]')
+    expect(result[1].text).to.eq('world ...')
     expect(result[1].facets).to.deep.eq([
       {
         index: { byteStart: 0, byteEnd: 5 },
@@ -316,7 +316,7 @@ describe('splitRichText', () => {
         ],
       },
     ])
-    expect(result[2].text).to.eq('another test again [3/3]')
+    expect(result[2].text).to.eq('another test again')
     expect(result[2].facets).to.deep.eq([])
   })
 })

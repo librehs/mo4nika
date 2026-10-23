@@ -130,7 +130,7 @@ export function splitRichText(
     return [m]
   }
 
-  splitLength = splitLength - ' ... [01/99]'.length // consider the `... [x/N]` part
+  splitLength = splitLength - ' ...'.length
   const splitTexts = splitText(m.text, splitLength)
   const msgs: BskyRichtextMessage[] = splitTexts.map((x) => ({
     text: x,
@@ -162,9 +162,7 @@ export function splitRichText(
   }
 
   for (const [index, msg] of msgs.entries()) {
-    msg.text += ` ${index + 1 < msgs.length ? '... ' : ''}[${index + 1}/${
-      msgs.length
-    }]`
+    msg.text += index + 1 < msgs.length ? '...' : ''
   }
 
   return msgs
